@@ -1,3 +1,3 @@
-[submodule "resource/library/PeNet"]
-	path = resource/library/PeNet
+[submodule "library/PeNet"]
+	path = library/PeNet
 	url = https://github.com/secana/PeNet

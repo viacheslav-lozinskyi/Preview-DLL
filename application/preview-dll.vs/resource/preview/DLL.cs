@@ -1,10 +1,13 @@
 
+using PeNet;
+
 namespace resource.preview
 {
     public class DLL : cartridge.AnyPreview
     {
         protected override void _Execute(atom.Trace context, string url)
         {
+            var a_Context = new PeFile(url);
             //var a_Context = new XmlDocument();
             //{
             //    a_Context.Load(url);

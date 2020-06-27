@@ -1,7 +1,7 @@
 
 namespace resource.preview
 {
-    public class XML : cartridge.AnyPreview
+    public class DLL : cartridge.AnyPreview
     {
         protected override void _Execute(atom.Trace context, string url)
         {

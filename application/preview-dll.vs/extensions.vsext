@@ -1,0 +1,11 @@
+{
+  "name": "Visual Studio preview core extentions",
+  "description": "Public Marketplace extension that adds output for preview plugins",
+  "version": "1.4.8",
+  "extensions": [
+    {
+      "name": "MetaProject",
+      "vsixId": "metaproject.2DEDB4CB-B638-4121-874B-191C988DFC69"
+    }
+  ]
+}

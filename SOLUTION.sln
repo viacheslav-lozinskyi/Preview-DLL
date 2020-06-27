@@ -1,0 +1,44 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 16
+VisualStudioVersion = 16.0.30011.22
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "application", "application", "{111DE3AB-A29F-47EE-BEE4-7BB8DF08CF0B}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "resource", "resource", "{B897641E-4668-4D18-9680-D29491DEB224}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "picture", "picture", "{6F1CDBEC-8284-4F1D-A232-2CAEEC410108}"
+	ProjectSection(SolutionItems) = preProject
+		resource\picture\icon.png = resource\picture\icon.png
+	EndProjectSection
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "video", "video", "{9CBB7A81-0908-47B3-9CEB-29DA5CD08988}"
+	ProjectSection(SolutionItems) = preProject
+		resource\video\Presentation1.gif = resource\video\Presentation1.gif
+	EndProjectSection
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "preview-dll.vs", "application\preview-dll.vs\preview-dll.vs.csproj", "{1EA9495A-3BDE-4887-8C41-364041DEC3AF}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{1EA9495A-3BDE-4887-8C41-364041DEC3AF}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{1EA9495A-3BDE-4887-8C41-364041DEC3AF}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{1EA9495A-3BDE-4887-8C41-364041DEC3AF}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{1EA9495A-3BDE-4887-8C41-364041DEC3AF}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(NestedProjects) = preSolution
+		{6F1CDBEC-8284-4F1D-A232-2CAEEC410108} = {B897641E-4668-4D18-9680-D29491DEB224}
+		{9CBB7A81-0908-47B3-9CEB-29DA5CD08988} = {B897641E-4668-4D18-9680-D29491DEB224}
+		{1EA9495A-3BDE-4887-8C41-364041DEC3AF} = {111DE3AB-A29F-47EE-BEE4-7BB8DF08CF0B}
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {A1BB0EA6-6A4F-4731-8167-0CD6174DFD42}
+	EndGlobalSection
+EndGlobal

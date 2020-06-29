@@ -3,11 +3,11 @@
   <Metadata>
     <Identity Id="PREVIEW-DLL.EC198F83-B43E-48F7-A346-3BA545D132DE" Version="1.0.1" Language="en-US" Publisher="Viacheslav Lozinskyi" />
     <DisplayName>Preview-DLL</DisplayName>
-    <Description xml:space="preserve">Quick preview of DLL files</Description>
+    <Description xml:space="preserve">Quick preview of DLL, EXE and SYS files</Description>
     <MoreInfo>https://marketplace.visualstudio.com/items?itemName=ViacheslavLozinskyi.Preview-DLL</MoreInfo>
     <License>resource\document\LICENSE</License>
     <Icon>resource\picture\icon.png</Icon>
-    <Tags>MetaPreview; MetaProject; DLL; EXE; PE; header; portable; executable; preview; viewer</Tags>
+    <Tags>MetaPreview; MetaProject; DLL; EXE; SYS; PE; PeNet; header; portable; executable; preview; viewer</Tags>
   </Metadata>
   <Installation>
     <InstallationTarget Version="[14.0, 17.0)" Id="Microsoft.VisualStudio.Community" />

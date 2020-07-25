@@ -50,7 +50,7 @@ namespace resource.preview
                 {
                     Send(context, level + 1, NAME.PATTERN.PARAMETER, "[[File name]]", url, TYPE.STRING, HINT.DATA_TYPE);
                     Send(context, level + 1, NAME.PATTERN.PARAMETER, "[[File size]]", (UInt64)data.FileSize, TYPE.INTEGER, HINT.DATA_TYPE);
-                    Send(context, level + 1, NAME.PATTERN.PARAMETER, "[[Flags]]", __GetFlags(data), TYPE.FLAGS, HINT.DATA_TYPE, data.IsSignatureValid ? NAME.FLAG.NONE: NAME.FLAG.WARNING, "");
+                    Send(context, level + 1, NAME.PATTERN.PARAMETER, "[[Flags]]", __GetFlags(data), TYPE.FLAGS, HINT.DATA_TYPE, data.IsSignatureValid ? NAME.FLAG.NONE : NAME.FLAG.WARNING, "");
                 }
             }
 
@@ -87,6 +87,11 @@ namespace resource.preview
                     foreach (var a_Context in data.Resources.VsVersionInfo.StringFileInfo.StringTable)
                     {
                         Send(context, level + 1, NAME.PATTERN.ELEMENT, string.IsNullOrEmpty(a_Context.ProductName) ? "<[[UNKNWON]]>" : a_Context.ProductName, "", TYPE.VERSION, HINT.DATA_TYPE);
+                        if (GetState() == STATE.CANCEL)
+                        {
+                            return;
+                        }
+                        else
                         {
                             Send(context, level + 2, NAME.PATTERN.VARIABLE, "[[Product Name]]", a_Context.ProductName, TYPE.STRING, HINT.DATA_TYPE);
                             Send(context, level + 2, NAME.PATTERN.VARIABLE, "[[Private Build]]", a_Context.PrivateBuild, TYPE.STRING, HINT.DATA_TYPE);
@@ -131,6 +136,11 @@ namespace resource.preview
             static public void Execute(atom.Trace context, int level, PeFile data)
             {
                 Send(context, level, NAME.PATTERN.FOLDER, "[[Headers]]", "");
+                if (GetState() == STATE.CANCEL)
+                {
+                    return;
+                }
+                else
                 {
                     Send(context, level + 1, NAME.PATTERN.ELEMENT, "[[File Header]]", "", TYPE.STRUCT, HINT.DATA_TYPE);
                     if ((data.ImageNtHeaders != null) && (data.ImageNtHeaders.FileHeader != null))
@@ -313,7 +323,7 @@ namespace resource.preview
         {
             static public void Execute(atom.Trace context, int level, PeFile data)
             {
-                // TODO: Implement it
+                // TODO: Implement visualization of .NET metadata
                 //Send(context, level, NAME.PATTERN.FOLDER, "[[Metadata]]", "");
             }
         }
@@ -328,6 +338,10 @@ namespace resource.preview
                     foreach (var a_Context in data.ExportedFunctions)
                     {
                         Send(context, level + 1, NAME.PATTERN.FUNCTION, GetFunctionName(a_Context.Name, a_Context.HasName), "", TYPE.FUNCTION, HINT.DATA_TYPE, a_Context.HasName ? NAME.FLAG.NONE : NAME.FLAG.WARNING, "");
+                        if (GetState() == STATE.CANCEL)
+                        {
+                            return;
+                        }
                         if (a_Context.HasForward)
                         {
                             Send(context, level + 2, NAME.PATTERN.VARIABLE, "[[Forward Name]]", a_Context.ForwardName, TYPE.STRING, HINT.DATA_TYPE);
@@ -354,6 +368,10 @@ namespace resource.preview
                     foreach (var a_Context in data.ImportedFunctions)
                     {
                         var a_Name = GetFunctionName(a_Context.Name, true);
+                        if (GetState() == STATE.CANCEL)
+                        {
+                            return;
+                        }
                         if (string.IsNullOrEmpty(a_Name) == false)
                         {
                             Send(context, level + 1, NAME.PATTERN.FUNCTION, a_Name, "", GetModuleName(a_Context.DLL), HINT.MODULE_NAME, string.IsNullOrEmpty(a_Context.Name) ? NAME.FLAG.WARNING : NAME.FLAG.NONE, a_Context.DLL);
@@ -382,6 +400,10 @@ namespace resource.preview
                     Send(context, level, NAME.PATTERN.FOLDER, "[[Import Modules]]", "", GetArraySize(a_Count), HINT.EMPTY);
                     foreach (var a_Context1 in data.ImportedFunctions)
                     {
+                        if (GetState() == STATE.CANCEL)
+                        {
+                            return;
+                        }
                         if (string.IsNullOrEmpty(a_Context1.DLL))
                         {
                             continue;
@@ -452,7 +474,7 @@ namespace resource.preview
                         __Execute(context, level + 1, data.ImageDebugDirectory);
                         __Execute(context, level + 1, data.ImageRelocationDirectory);
                         __Execute(context, level + 1, data.ImageResourceDirectory);
-                        // TODO: Uncomment it after performance issue of MetaPreview will be solved
+                        // TODO: Uncomment it after performance issue of MetaProject will be solved
                         //__Execute(context, level + 1, data.ExceptionDirectory);
                         __Execute(context, level + 1, data.ImageTlsDirectory);
                         __Execute(context, level + 1, data.ImageLoadConfigDirectory);
@@ -487,6 +509,11 @@ namespace resource.preview
                     foreach (var a_Context in data)
                     {
                         Send(context, level + 1, NAME.PATTERN.ELEMENT, GetHex(a_Context.PointerToRawData), "", TYPE.STRUCT, HINT.DATA_TYPE);
+                        if (GetState() == STATE.CANCEL)
+                        {
+                            return;
+                        }
+                        else
                         {
                             Send(context, level + 2, NAME.PATTERN.VARIABLE, "[[TimeStamp]]", GetHex(a_Context.TimeDateStamp), TYPE.INTEGER, HINT.DATA_TYPE);
                             Send(context, level + 2, NAME.PATTERN.VARIABLE, "[[Version]]", GetVersion(a_Context.MajorVersion, a_Context.MinorVersion), TYPE.VERSION, HINT.DATA_TYPE);
@@ -515,6 +542,11 @@ namespace resource.preview
                     foreach (var a_Context in data)
                     {
                         Send(context, level + 1, NAME.PATTERN.ELEMENT, GetHex(a_Context.VirtualAddress), "", TYPE.STRUCT, HINT.DATA_TYPE);
+                        if (GetState() == STATE.CANCEL)
+                        {
+                            return;
+                        }
+                        else
                         {
                             Send(context, level + 2, NAME.PATTERN.VARIABLE, "[[Virtual Address]]", GetHex(a_Context.VirtualAddress), TYPE.POINTER, HINT.DATA_TYPE);
                             Send(context, level + 2, NAME.PATTERN.VARIABLE, "[[Size Of Block]]", a_Context.SizeOfBlock, TYPE.INTEGER, HINT.DATA_TYPE);
@@ -554,6 +586,10 @@ namespace resource.preview
                     foreach (var a_Context in data)
                     {
                         Send(context, level + 1, NAME.PATTERN.ELEMENT, GetHex(a_Context.FunctionStart), "", TYPE.FUNCTION, HINT.DATA_TYPE);
+                        if (GetState() == STATE.CANCEL)
+                        {
+                            return;
+                        }
                         {
                             Send(context, level + 2, NAME.PATTERN.VARIABLE, "[[Function Start]]", GetHex(a_Context.FunctionStart), TYPE.POINTER, HINT.DATA_TYPE);
                             Send(context, level + 2, NAME.PATTERN.VARIABLE, "[[Function End]]", GetHex(a_Context.FunctionEnd), TYPE.POINTER, HINT.DATA_TYPE);
@@ -588,6 +624,11 @@ namespace resource.preview
                 if (data != null)
                 {
                     Send(context, level, NAME.PATTERN.FOLDER, "[[Thread Local Storage]]", "", TYPE.DIRECTORY, HINT.DATA_TYPE);
+                    if (GetState() == STATE.CANCEL)
+                    {
+                        return;
+                    }
+                    else
                     {
                         Send(context, level + 1, NAME.PATTERN.VARIABLE, "[[Start Address Of Raw Data]]", GetHex(data.StartAddressOfRawData), TYPE.POINTER, HINT.DATA_TYPE);
                         Send(context, level + 1, NAME.PATTERN.VARIABLE, "[[End Address Of Raw Data]]", GetHex(data.EndAddressOfRawData), TYPE.POINTER, HINT.DATA_TYPE);
@@ -669,6 +710,11 @@ namespace resource.preview
                     foreach (var a_Context in data)
                     {
                         Send(context, level + 1, NAME.PATTERN.FOLDER, GetHex(a_Context.Name), "", TYPE.STRUCT, HINT.DATA_TYPE);
+                        if (GetState() == STATE.CANCEL)
+                        {
+                            return;
+                        }
+                        else
                         {
                             Send(context, level + 2, NAME.PATTERN.VARIABLE, "[[TimeStamp]]", GetHex(a_Context.TimeDateStamp), TYPE.INTEGER, HINT.DATA_TYPE);
                             Send(context, level + 2, NAME.PATTERN.VARIABLE, "[[Name]]", GetHex(a_Context.Name), TYPE.POINTER, HINT.DATA_TYPE);
@@ -797,6 +843,11 @@ namespace resource.preview
                     foreach (var a_Context in data.ImageSectionHeaders)
                     {
                         Send(context, level + 1, NAME.PATTERN.ELEMENT, a_Context.NameResolved, "", TYPE.SECTION, HINT.DATA_TYPE);
+                        if (GetState() == STATE.CANCEL)
+                        {
+                            return;
+                        }
+                        else
                         {
                             Send(context, level + 2, NAME.PATTERN.VARIABLE, "[[Image Base Address]]", GetHex(a_Context.ImageBaseAddress), TYPE.POINTER, HINT.DATA_TYPE);
                             Send(context, level + 2, NAME.PATTERN.VARIABLE, "[[Virtual Address]]", GetHex(a_Context.VirtualAddress), TYPE.POINTER, HINT.DATA_TYPE);
@@ -942,6 +993,10 @@ namespace resource.preview
                         Send(context, level + 1, NAME.PATTERN.ELEMENT, "[[Extensions]]", "", TYPE.STRUCT, HINT.DATA_TYPE);
                         foreach (var a_Context in data.Extensions)
                         {
+                            if (GetState() == STATE.CANCEL)
+                            {
+                                return;
+                            }
                             if (a_Context.Oid != null)
                             {
                                 Send(context, level + 2, NAME.PATTERN.ELEMENT, a_Context.Oid.FriendlyName, "", TYPE.STRUCT, HINT.DATA_TYPE);
@@ -987,6 +1042,11 @@ namespace resource.preview
             else
             {
                 Send(context, 1, NAME.PATTERN.ELEMENT, "[[This is not]] PE [[data format]]", "", "", HINT.EMPTY, NAME.FLAG.ERROR, "");
+            }
+            if (GetState() == STATE.CANCEL)
+            {
+                context.
+                    SendWarning(1, NAME.WARNING.TERMINATED);
             }
         }
 

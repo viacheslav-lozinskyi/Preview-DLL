@@ -46,11 +46,11 @@ namespace resource.preview
         {
             static public void Execute(atom.Trace context, int level, PeFile data, string url)
             {
-                Send(context, level, NAME.PATTERN.FOLDER, "[[Info]]", "", "", "", NAME.FLAG.EXPAND, "");
+                Send(context, level, NAME.PATTERN.FOLDER, "[[Info]]", "", "", "", NAME.STATE.HEADER, "");
                 {
                     Send(context, level + 1, NAME.PATTERN.PARAMETER, "[[File name]]", url, TYPE.STRING, HINT.DATA_TYPE);
                     Send(context, level + 1, NAME.PATTERN.PARAMETER, "[[File size]]", (UInt64)data.FileSize, TYPE.INTEGER, HINT.DATA_TYPE);
-                    Send(context, level + 1, NAME.PATTERN.PARAMETER, "[[Flags]]", __GetFlags(data), TYPE.FLAGS, HINT.DATA_TYPE, data.IsSignatureValid ? NAME.FLAG.NONE : NAME.FLAG.WARNING, "");
+                    Send(context, level + 1, NAME.PATTERN.PARAMETER, "[[Flags]]", __GetFlags(data), TYPE.FLAGS, HINT.DATA_TYPE, data.IsSignatureValid ? NAME.STATE.NONE : NAME.STATE.WARNING, "");
                 }
             }
 
@@ -337,7 +337,7 @@ namespace resource.preview
                     Send(context, level, NAME.PATTERN.FOLDER, "[[Export Functions]]", "", GetArraySize(data.ExportedFunctions), HINT.EMPTY);
                     foreach (var a_Context in data.ExportedFunctions)
                     {
-                        Send(context, level + 1, NAME.PATTERN.FUNCTION, GetFunctionName(a_Context.Name, a_Context.HasName), "", TYPE.FUNCTION, HINT.DATA_TYPE, a_Context.HasName ? NAME.FLAG.NONE : NAME.FLAG.WARNING, "");
+                        Send(context, level + 1, NAME.PATTERN.FUNCTION, GetFunctionName(a_Context.Name, a_Context.HasName), "", TYPE.FUNCTION, HINT.DATA_TYPE, a_Context.HasName ? NAME.STATE.NONE : NAME.STATE.WARNING, "");
                         if (GetState() == STATE.CANCEL)
                         {
                             return;
@@ -374,7 +374,7 @@ namespace resource.preview
                         }
                         if (string.IsNullOrEmpty(a_Name) == false)
                         {
-                            Send(context, level + 1, NAME.PATTERN.FUNCTION, a_Name, "", GetModuleName(a_Context.DLL), HINT.MODULE_NAME, string.IsNullOrEmpty(a_Context.Name) ? NAME.FLAG.WARNING : NAME.FLAG.NONE, a_Context.DLL);
+                            Send(context, level + 1, NAME.PATTERN.FUNCTION, a_Name, "", GetModuleName(a_Context.DLL), HINT.MODULE_NAME, string.IsNullOrEmpty(a_Context.Name) ? NAME.STATE.WARNING : NAME.STATE.NONE, a_Context.DLL);
                             if (a_Name != a_Context.Name)
                             {
                                 Send(context, level + 2, NAME.PATTERN.VARIABLE, "[[Name]]", a_Context.Name, TYPE.STRING, HINT.DATA_TYPE);
@@ -413,7 +413,7 @@ namespace resource.preview
                             continue;
                         }
                         {
-                            Send(context, level + 1, NAME.PATTERN.ELEMENT, a_Context1.DLL, "", "[[Module]]", HINT.DATA_TYPE, NAME.FLAG.NONE, a_Context1.DLL);
+                            Send(context, level + 1, NAME.PATTERN.ELEMENT, a_Context1.DLL, "", "[[Module]]", HINT.DATA_TYPE, NAME.STATE.NONE, a_Context1.DLL);
                         }
                         {
                             a_Context += a_Context1.DLL.ToUpper() + "\n";
@@ -1041,7 +1041,7 @@ namespace resource.preview
             }
             else
             {
-                Send(context, 1, NAME.PATTERN.ELEMENT, "[[This is not]] PE [[data format]]", "", "", HINT.EMPTY, NAME.FLAG.ERROR, "");
+                Send(context, 1, NAME.PATTERN.ELEMENT, "[[This is not]] PE [[data format]]", "", "", HINT.EMPTY, NAME.STATE.ERROR, "");
             }
             if (GetState() == STATE.CANCEL)
             {
@@ -1058,8 +1058,9 @@ namespace resource.preview
                 SetValue(GetCleanString(value)).
                 SetComment(comment).
                 SetPattern(pattern).
-                SetFlag(flag).
-                SetHint(hint).
+                SetState(flag).
+                SetState(flag == NAME.STATE.HEADER ? NAME.STATE.EXPAND : NAME.STATE.NONE).
+                SetCommentHint(hint).
                 SetUrl(url).
                 SetLevel(level).
                 Send();
@@ -1073,8 +1074,9 @@ namespace resource.preview
                 SetValue(value.ToString()).
                 SetComment(comment).
                 SetPattern(pattern).
-                SetFlag(flag).
-                SetHint(hint).
+                SetState(flag).
+                SetState(flag == NAME.STATE.HEADER ? NAME.STATE.EXPAND : NAME.STATE.NONE).
+                SetCommentHint(hint).
                 SetUrl(url).
                 SetLevel(level).
                 Send();
@@ -1082,22 +1084,22 @@ namespace resource.preview
 
         internal static void Send(atom.Trace context, int level, string pattern, string name, string value, string comment, string hint)
         {
-            Send(context, level, pattern, name, value, comment, hint, NAME.FLAG.NONE, "");
+            Send(context, level, pattern, name, value, comment, hint, NAME.STATE.NONE, "");
         }
 
         internal static void Send(atom.Trace context, int level, string pattern, string name, UInt64 value, string comment, string hint)
         {
-            Send(context, level, pattern, name, value, comment, hint, NAME.FLAG.NONE, "");
+            Send(context, level, pattern, name, value, comment, hint, NAME.STATE.NONE, "");
         }
 
         internal static void Send(atom.Trace context, int level, string pattern, string name, string value)
         {
-            Send(context, level, pattern, name, value, "", HINT.EMPTY, NAME.FLAG.NONE, "");
+            Send(context, level, pattern, name, value, "", HINT.EMPTY, NAME.STATE.NONE, "");
         }
 
         internal static void Send(atom.Trace context, int level, string pattern, string name, UInt64 value)
         {
-            Send(context, level, pattern, name, value, "", HINT.EMPTY, NAME.FLAG.NONE, "");
+            Send(context, level, pattern, name, value, "", HINT.EMPTY, NAME.STATE.NONE, "");
         }
 
         internal static string AddFlag(string context, string value, bool isEnabled)

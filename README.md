@@ -7,7 +7,14 @@
 ![Image](https://img.shields.io/badge/VS-2015-blueviolet)
 
 ### Now you can look inside DLL, EXE or SYS files not opening it.
+---
 
 ![Image](resource/video/Presentation1.gif)
 
+---
 Download the extension from the [Visual Studio Marketplace](https://marketplace.visualstudio.com/items?itemName=ViacheslavLozinskyi.Preview-DLL)
+
+---
+Data visualization is based on [MetaProject](https://marketplace.visualstudio.com/items?itemName=ViacheslavLozinskyi.MetaProject)
+
+Data extraction is based on [PeNet](http://secana.github.io/PeNet/index.html)

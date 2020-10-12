@@ -6,7 +6,7 @@
 ![Image](https://img.shields.io/badge/VS-2017-blueviolet)
 ![Image](https://img.shields.io/badge/VS-2015-blueviolet)
 
-### Now you can look inside DLL, EXE or SYS files not opening it.
+### Now you can look inside [DLL](https://en.wikipedia.org/wiki/Dynamic-link_library), [EXE](https://en.wikipedia.org/wiki/.exe) or [SYS](https://en.wikipedia.org/wiki/.sys) files not opening it.
 ---
 
 ![Image](resource/video/Presentation1.gif)

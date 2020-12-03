@@ -1,7 +1,7 @@
 {
   "name": "Visual Studio preview core extentions",
   "description": "Public Marketplace extension that adds output for preview plugins",
-  "version": "1.0.5",
+  "version": "1.0.6",
   "extensions": [
     {
       "name": "MetaProject",

@@ -46,7 +46,7 @@
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="resource\package\VSPackage.cs" />
     <Compile Include="resource\preview\System.cs" />
-    <Compile Include="resource\preview\DLL.cs" />
+    <Compile Include="resource\preview\VSPreview.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="source.extension.vsixmanifest">
@@ -68,8 +68,8 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
-    <PackageReference Include="MetaPreview">
-      <Version>1.1.1</Version>
+    <PackageReference Include="MetaPreview.Core">
+      <Version>1.0.1</Version>
     </PackageReference>
     <PackageReference Include="PeNet">
       <Version>1.6.1</Version>

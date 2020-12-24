@@ -2,6 +2,7 @@
 using PeNet;
 using PeNet.Structures;
 using System;
+using System.IO;
 using System.Runtime.InteropServices;
 using System.Security.Cryptography.X509Certificates;
 using System.Text;
@@ -46,11 +47,11 @@ namespace resource.preview
         {
             static public void Execute(atom.Trace context, int level, PeFile data, string url)
             {
-                Send(context, level, NAME.TYPE.FOLDER, "[[Info]]", "", "", "", NAME.STATE.HEADER, "");
+                Send(context, NAME.TYPE.FOLDER, level, "[[Info]]", "", "", "", NAME.STATE.HEADER, "");
                 {
-                    Send(context, level + 1, NAME.TYPE.VARIABLE, "[[File Name]]", url, TYPE.STRING, HINT.DATA_TYPE);
-                    Send(context, level + 1, NAME.TYPE.VARIABLE, "[[File Size]]", (UInt64)data.FileSize, TYPE.INTEGER, HINT.DATA_TYPE);
-                    Send(context, level + 1, NAME.TYPE.VARIABLE, "[[Flags]]", __GetFlags(data), TYPE.FLAGS, HINT.DATA_TYPE, NAME.STATE.NONE, "");
+                    Send(context, NAME.TYPE.VARIABLE, level + 1, "[[File Name]]", url, TYPE.STRING, HINT.DATA_TYPE);
+                    Send(context, NAME.TYPE.VARIABLE, level + 1, "[[File Size]]", (UInt64)data.FileSize, TYPE.INTEGER, HINT.DATA_TYPE);
+                    Send(context, NAME.TYPE.VARIABLE, level + 1, "[[Flags]]", __GetFlags(data), TYPE.FLAGS, HINT.DATA_TYPE, NAME.STATE.NONE, "");
                 }
             }
 
@@ -83,28 +84,28 @@ namespace resource.preview
             {
                 if ((data.Resources != null) && (data.Resources.VsVersionInfo != null) && (data.Resources.VsVersionInfo.StringFileInfo != null) && (data.Resources.VsVersionInfo.StringFileInfo.StringTable != null))
                 {
-                    Send(context, level, NAME.TYPE.FOLDER, "[[Versions]]", "", GetArraySize(data.Resources.VsVersionInfo.StringFileInfo.StringTable.Length), HINT.EMPTY);
+                    Send(context, NAME.TYPE.FOLDER, level, "[[Versions]]", "", GetArraySize(data.Resources.VsVersionInfo.StringFileInfo.StringTable.Length), HINT.EMPTY);
                     foreach (var a_Context in data.Resources.VsVersionInfo.StringFileInfo.StringTable)
                     {
-                        Send(context, level + 1, NAME.TYPE.INFO, string.IsNullOrEmpty(a_Context.ProductName) ? "<[[UNKNWON]]>" : a_Context.ProductName, "", TYPE.VERSION, HINT.DATA_TYPE);
+                        Send(context, NAME.TYPE.INFO, level + 1, string.IsNullOrEmpty(a_Context.ProductName) ? "<[[UNKNWON]]>" : a_Context.ProductName, "", TYPE.VERSION, HINT.DATA_TYPE);
                         if (GetState() == STATE.CANCEL)
                         {
                             return;
                         }
                         else
                         {
-                            Send(context, level + 2, NAME.TYPE.VARIABLE, "[[Product Name]]", a_Context.ProductName, TYPE.STRING, HINT.DATA_TYPE);
-                            Send(context, level + 2, NAME.TYPE.VARIABLE, "[[Private Build]]", a_Context.PrivateBuild, TYPE.STRING, HINT.DATA_TYPE);
-                            Send(context, level + 2, NAME.TYPE.VARIABLE, "[[Original Filename]]", a_Context.OriginalFilename, TYPE.STRING, HINT.DATA_TYPE);
-                            Send(context, level + 2, NAME.TYPE.VARIABLE, "[[Legal Trademarks]]", a_Context.LegalTrademarks, TYPE.STRING, HINT.DATA_TYPE);
-                            Send(context, level + 2, NAME.TYPE.VARIABLE, "[[Legal Copyright]]", a_Context.LegalCopyright, TYPE.STRING, HINT.DATA_TYPE);
-                            Send(context, level + 2, NAME.TYPE.VARIABLE, "[[Internal Name]]", a_Context.InternalName, TYPE.STRING, HINT.DATA_TYPE);
-                            Send(context, level + 2, NAME.TYPE.VARIABLE, "[[File Version]]", a_Context.FileVersion, TYPE.STRING, HINT.DATA_TYPE);
-                            Send(context, level + 2, NAME.TYPE.VARIABLE, "[[File Description]]", a_Context.FileDescription, TYPE.STRING, HINT.DATA_TYPE);
-                            Send(context, level + 2, NAME.TYPE.VARIABLE, "[[Company Name]]", a_Context.CompanyName, TYPE.STRING, HINT.DATA_TYPE);
-                            Send(context, level + 2, NAME.TYPE.VARIABLE, "[[Comments]]", a_Context.Comments, TYPE.STRING, HINT.DATA_TYPE);
-                            Send(context, level + 2, NAME.TYPE.VARIABLE, "[[Product Version]]", a_Context.ProductVersion, TYPE.STRING, HINT.DATA_TYPE);
-                            Send(context, level + 2, NAME.TYPE.VARIABLE, "[[Special Build]]", a_Context.SpecialBuild, TYPE.STRING, HINT.DATA_TYPE);
+                            Send(context, NAME.TYPE.VARIABLE, level + 2, "[[Product Name]]", a_Context.ProductName, TYPE.STRING, HINT.DATA_TYPE);
+                            Send(context, NAME.TYPE.VARIABLE, level + 2, "[[Private Build]]", a_Context.PrivateBuild, TYPE.STRING, HINT.DATA_TYPE);
+                            Send(context, NAME.TYPE.VARIABLE, level + 2, "[[Original Filename]]", a_Context.OriginalFilename, TYPE.STRING, HINT.DATA_TYPE);
+                            Send(context, NAME.TYPE.VARIABLE, level + 2, "[[Legal Trademarks]]", a_Context.LegalTrademarks, TYPE.STRING, HINT.DATA_TYPE);
+                            Send(context, NAME.TYPE.VARIABLE, level + 2, "[[Legal Copyright]]", a_Context.LegalCopyright, TYPE.STRING, HINT.DATA_TYPE);
+                            Send(context, NAME.TYPE.VARIABLE, level + 2, "[[Internal Name]]", a_Context.InternalName, TYPE.STRING, HINT.DATA_TYPE);
+                            Send(context, NAME.TYPE.VARIABLE, level + 2, "[[File Version]]", a_Context.FileVersion, TYPE.STRING, HINT.DATA_TYPE);
+                            Send(context, NAME.TYPE.VARIABLE, level + 2, "[[File Description]]", a_Context.FileDescription, TYPE.STRING, HINT.DATA_TYPE);
+                            Send(context, NAME.TYPE.VARIABLE, level + 2, "[[Company Name]]", a_Context.CompanyName, TYPE.STRING, HINT.DATA_TYPE);
+                            Send(context, NAME.TYPE.VARIABLE, level + 2, "[[Comments]]", a_Context.Comments, TYPE.STRING, HINT.DATA_TYPE);
+                            Send(context, NAME.TYPE.VARIABLE, level + 2, "[[Product Version]]", a_Context.ProductVersion, TYPE.STRING, HINT.DATA_TYPE);
+                            Send(context, NAME.TYPE.VARIABLE, level + 2, "[[Special Build]]", a_Context.SpecialBuild, TYPE.STRING, HINT.DATA_TYPE);
                         }
                         foreach (var a_Context1 in a_Context.String)
                         {
@@ -123,7 +124,7 @@ namespace resource.preview
                                 if (a_Context1.szKey == "SpecialBuild") continue;
                             }
                             {
-                                Send(context, level + 2, NAME.TYPE.VARIABLE, a_Context1.szKey, a_Context1.Value, TYPE.STRING, HINT.DATA_TYPE);
+                                Send(context, NAME.TYPE.VARIABLE, level + 2, a_Context1.szKey, a_Context1.Value, TYPE.STRING, HINT.DATA_TYPE);
                             }
                         }
                     }
@@ -135,77 +136,77 @@ namespace resource.preview
         {
             static public void Execute(atom.Trace context, int level, PeFile data)
             {
-                Send(context, level, NAME.TYPE.FOLDER, "[[Headers]]", "");
+                Send(context, NAME.TYPE.FOLDER, level, "[[Headers]]", "");
                 if (GetState() == STATE.CANCEL)
                 {
                     return;
                 }
                 else
                 {
-                    Send(context, level + 1, NAME.TYPE.INFO, "[[File Header]]", "", TYPE.STRUCT, HINT.DATA_TYPE);
+                    Send(context, NAME.TYPE.INFO, level + 1, "[[File Header]]", "", TYPE.STRUCT, HINT.DATA_TYPE);
                     if ((data.ImageNtHeaders != null) && (data.ImageNtHeaders.FileHeader != null))
                     {
-                        Send(context, level + 2, NAME.TYPE.VARIABLE, "[[Machine]]", __GetMachine(data.ImageNtHeaders.FileHeader.Machine), TYPE.ENUM, HINT.DATA_TYPE);
-                        Send(context, level + 2, NAME.TYPE.VARIABLE, "[[TimeStamp]]", GetHex(data.ImageNtHeaders.FileHeader.TimeDateStamp), TYPE.INTEGER, HINT.DATA_TYPE);
-                        Send(context, level + 2, NAME.TYPE.VARIABLE, "[[Pointer To Symbol Table]]", data.ImageNtHeaders.FileHeader.PointerToSymbolTable, TYPE.INTEGER, HINT.DATA_TYPE);
-                        Send(context, level + 2, NAME.TYPE.VARIABLE, "[[Number Of Symbols]]", data.ImageNtHeaders.FileHeader.NumberOfSymbols, TYPE.INTEGER, HINT.DATA_TYPE);
-                        Send(context, level + 2, NAME.TYPE.VARIABLE, "[[Number Of Sections]]", data.ImageNtHeaders.FileHeader.NumberOfSections, TYPE.INTEGER, HINT.DATA_TYPE);
-                        Send(context, level + 2, NAME.TYPE.VARIABLE, "[[Characteristics]]", __GetCharacteristics(data.ImageNtHeaders.FileHeader.Characteristics), TYPE.FLAGS, HINT.DATA_TYPE);
+                        Send(context, NAME.TYPE.VARIABLE, level + 2, "[[Machine]]", __GetMachine(data.ImageNtHeaders.FileHeader.Machine), TYPE.ENUM, HINT.DATA_TYPE);
+                        Send(context, NAME.TYPE.VARIABLE, level + 2, "[[TimeStamp]]", GetHex(data.ImageNtHeaders.FileHeader.TimeDateStamp), TYPE.INTEGER, HINT.DATA_TYPE);
+                        Send(context, NAME.TYPE.VARIABLE, level + 2, "[[Pointer To Symbol Table]]", data.ImageNtHeaders.FileHeader.PointerToSymbolTable, TYPE.INTEGER, HINT.DATA_TYPE);
+                        Send(context, NAME.TYPE.VARIABLE, level + 2, "[[Number Of Symbols]]", data.ImageNtHeaders.FileHeader.NumberOfSymbols, TYPE.INTEGER, HINT.DATA_TYPE);
+                        Send(context, NAME.TYPE.VARIABLE, level + 2, "[[Number Of Sections]]", data.ImageNtHeaders.FileHeader.NumberOfSections, TYPE.INTEGER, HINT.DATA_TYPE);
+                        Send(context, NAME.TYPE.VARIABLE, level + 2, "[[Characteristics]]", __GetCharacteristics(data.ImageNtHeaders.FileHeader.Characteristics), TYPE.FLAGS, HINT.DATA_TYPE);
                     }
                 }
                 {
-                    Send(context, level + 1, NAME.TYPE.INFO, "[[Optional Header]]", "", TYPE.STRUCT, HINT.DATA_TYPE);
+                    Send(context, NAME.TYPE.INFO, level + 1, "[[Optional Header]]", "", TYPE.STRUCT, HINT.DATA_TYPE);
                     if ((data.ImageNtHeaders != null) && (data.ImageNtHeaders.OptionalHeader != null))
                     {
-                        Send(context, level + 2, NAME.TYPE.VARIABLE, "[[CheckSum]]", GetHex(data.ImageNtHeaders.OptionalHeader.CheckSum), TYPE.INTEGER, HINT.DATA_TYPE);
-                        Send(context, level + 2, NAME.TYPE.VARIABLE, "[[Address Of Entry Point]]", GetHex(data.ImageNtHeaders.OptionalHeader.AddressOfEntryPoint), TYPE.POINTER, HINT.DATA_TYPE);
-                        Send(context, level + 2, NAME.TYPE.VARIABLE, "[[Image Base]]", GetHex(data.ImageNtHeaders.OptionalHeader.ImageBase), TYPE.POINTER, HINT.DATA_TYPE);
-                        Send(context, level + 2, NAME.TYPE.VARIABLE, "[[Base Of Data]]", data.ImageNtHeaders.OptionalHeader.BaseOfData, TYPE.INTEGER, HINT.DATA_TYPE);
-                        Send(context, level + 2, NAME.TYPE.VARIABLE, "[[Base Of Code]]", data.ImageNtHeaders.OptionalHeader.BaseOfCode, TYPE.INTEGER, HINT.DATA_TYPE);
-                        Send(context, level + 2, NAME.TYPE.VARIABLE, "[[Size Of Heap Commit]]", data.ImageNtHeaders.OptionalHeader.SizeOfHeapCommit, TYPE.INTEGER, HINT.DATA_TYPE);
-                        Send(context, level + 2, NAME.TYPE.VARIABLE, "[[Size Of Heap Reserve]]", data.ImageNtHeaders.OptionalHeader.SizeOfHeapReserve, TYPE.INTEGER, HINT.DATA_TYPE);
-                        Send(context, level + 2, NAME.TYPE.VARIABLE, "[[Size Of Stack Commit]]", data.ImageNtHeaders.OptionalHeader.SizeOfStackCommit, TYPE.INTEGER, HINT.DATA_TYPE);
-                        Send(context, level + 2, NAME.TYPE.VARIABLE, "[[Size Of Stack Reserve]]", data.ImageNtHeaders.OptionalHeader.SizeOfStackReserve, TYPE.INTEGER, HINT.DATA_TYPE);
-                        Send(context, level + 2, NAME.TYPE.VARIABLE, "[[Size Of Headers]]", data.ImageNtHeaders.OptionalHeader.SizeOfHeaders, TYPE.INTEGER, HINT.DATA_TYPE);
-                        Send(context, level + 2, NAME.TYPE.VARIABLE, "[[Size Of Image]]", data.ImageNtHeaders.OptionalHeader.SizeOfImage, TYPE.INTEGER, HINT.DATA_TYPE);
-                        Send(context, level + 2, NAME.TYPE.VARIABLE, "[[Size Of Uninitialized Data]]", data.ImageNtHeaders.OptionalHeader.SizeOfUninitializedData, TYPE.INTEGER, HINT.DATA_TYPE);
-                        Send(context, level + 2, NAME.TYPE.VARIABLE, "[[Size Of Initialized Data]]", data.ImageNtHeaders.OptionalHeader.SizeOfInitializedData, TYPE.INTEGER, HINT.DATA_TYPE);
-                        Send(context, level + 2, NAME.TYPE.VARIABLE, "[[Size Of Code]]", data.ImageNtHeaders.OptionalHeader.SizeOfCode, TYPE.INTEGER, HINT.DATA_TYPE);
-                        Send(context, level + 2, NAME.TYPE.VARIABLE, "[[File Alignment]]", data.ImageNtHeaders.OptionalHeader.FileAlignment, TYPE.INTEGER, HINT.DATA_TYPE);
-                        Send(context, level + 2, NAME.TYPE.VARIABLE, "[[Section Alignment]]", data.ImageNtHeaders.OptionalHeader.SectionAlignment, TYPE.INTEGER, HINT.DATA_TYPE);
-                        Send(context, level + 2, NAME.TYPE.VARIABLE, "[[Characteristics]]", __GetDllCharacteristics(data.ImageNtHeaders.OptionalHeader.DllCharacteristics), TYPE.FLAGS, HINT.DATA_TYPE);
-                        Send(context, level + 2, NAME.TYPE.VARIABLE, "[[Subsystem]]", __GetSubsystem(data.ImageNtHeaders.OptionalHeader.Subsystem), TYPE.ENUM, HINT.DATA_TYPE);
-                        Send(context, level + 2, NAME.TYPE.VARIABLE, "[[Magic]]", __GetMagic(data.ImageNtHeaders.OptionalHeader.Magic), TYPE.FLAGS, HINT.DATA_TYPE);
-                        Send(context, level + 2, NAME.TYPE.VARIABLE, "[[Loader Flags]]", GetHex(data.ImageNtHeaders.OptionalHeader.LoaderFlags), TYPE.FLAGS, HINT.DATA_TYPE);
-                        Send(context, level + 2, NAME.TYPE.VARIABLE, "[[Number Of]] RVA [[And Sizes]]", data.ImageNtHeaders.OptionalHeader.NumberOfRvaAndSizes, TYPE.INTEGER, HINT.DATA_TYPE);
-                        Send(context, level + 2, NAME.TYPE.VARIABLE, "[[Image Version]]", GetVersion(data.ImageNtHeaders.OptionalHeader.MajorImageVersion, data.ImageNtHeaders.OptionalHeader.MinorImageVersion), TYPE.VERSION, HINT.DATA_TYPE);
-                        Send(context, level + 2, NAME.TYPE.VARIABLE, "[[Linker Version]]", GetVersion(data.ImageNtHeaders.OptionalHeader.MajorLinkerVersion, data.ImageNtHeaders.OptionalHeader.MinorLinkerVersion), TYPE.VERSION, HINT.DATA_TYPE);
-                        Send(context, level + 2, NAME.TYPE.VARIABLE, "[[Subsystem Version]]", GetVersion(data.ImageNtHeaders.OptionalHeader.MajorSubsystemVersion, data.ImageNtHeaders.OptionalHeader.MinorSubsystemVersion), TYPE.VERSION, HINT.DATA_TYPE);
-                        Send(context, level + 2, NAME.TYPE.VARIABLE, "[[Operating System Version]]", GetVersion(data.ImageNtHeaders.OptionalHeader.MajorOperatingSystemVersion, data.ImageNtHeaders.OptionalHeader.MinorOperatingSystemVersion), TYPE.VERSION, HINT.DATA_TYPE);
-                        Send(context, level + 2, NAME.TYPE.VARIABLE, "Win32 [[Version]]", data.ImageNtHeaders.OptionalHeader.Win32VersionValue, TYPE.INTEGER, HINT.DATA_TYPE);
+                        Send(context, NAME.TYPE.VARIABLE, level + 2, "[[CheckSum]]", GetHex(data.ImageNtHeaders.OptionalHeader.CheckSum), TYPE.INTEGER, HINT.DATA_TYPE);
+                        Send(context, NAME.TYPE.VARIABLE, level + 2, "[[Address Of Entry Point]]", GetHex(data.ImageNtHeaders.OptionalHeader.AddressOfEntryPoint), TYPE.POINTER, HINT.DATA_TYPE);
+                        Send(context, NAME.TYPE.VARIABLE, level + 2, "[[Image Base]]", GetHex(data.ImageNtHeaders.OptionalHeader.ImageBase), TYPE.POINTER, HINT.DATA_TYPE);
+                        Send(context, NAME.TYPE.VARIABLE, level + 2, "[[Base Of Data]]", data.ImageNtHeaders.OptionalHeader.BaseOfData, TYPE.INTEGER, HINT.DATA_TYPE);
+                        Send(context, NAME.TYPE.VARIABLE, level + 2, "[[Base Of Code]]", data.ImageNtHeaders.OptionalHeader.BaseOfCode, TYPE.INTEGER, HINT.DATA_TYPE);
+                        Send(context, NAME.TYPE.VARIABLE, level + 2, "[[Size Of Heap Commit]]", data.ImageNtHeaders.OptionalHeader.SizeOfHeapCommit, TYPE.INTEGER, HINT.DATA_TYPE);
+                        Send(context, NAME.TYPE.VARIABLE, level + 2, "[[Size Of Heap Reserve]]", data.ImageNtHeaders.OptionalHeader.SizeOfHeapReserve, TYPE.INTEGER, HINT.DATA_TYPE);
+                        Send(context, NAME.TYPE.VARIABLE, level + 2, "[[Size Of Stack Commit]]", data.ImageNtHeaders.OptionalHeader.SizeOfStackCommit, TYPE.INTEGER, HINT.DATA_TYPE);
+                        Send(context, NAME.TYPE.VARIABLE, level + 2, "[[Size Of Stack Reserve]]", data.ImageNtHeaders.OptionalHeader.SizeOfStackReserve, TYPE.INTEGER, HINT.DATA_TYPE);
+                        Send(context, NAME.TYPE.VARIABLE, level + 2, "[[Size Of Headers]]", data.ImageNtHeaders.OptionalHeader.SizeOfHeaders, TYPE.INTEGER, HINT.DATA_TYPE);
+                        Send(context, NAME.TYPE.VARIABLE, level + 2, "[[Size Of Image]]", data.ImageNtHeaders.OptionalHeader.SizeOfImage, TYPE.INTEGER, HINT.DATA_TYPE);
+                        Send(context, NAME.TYPE.VARIABLE, level + 2, "[[Size Of Uninitialized Data]]", data.ImageNtHeaders.OptionalHeader.SizeOfUninitializedData, TYPE.INTEGER, HINT.DATA_TYPE);
+                        Send(context, NAME.TYPE.VARIABLE, level + 2, "[[Size Of Initialized Data]]", data.ImageNtHeaders.OptionalHeader.SizeOfInitializedData, TYPE.INTEGER, HINT.DATA_TYPE);
+                        Send(context, NAME.TYPE.VARIABLE, level + 2, "[[Size Of Code]]", data.ImageNtHeaders.OptionalHeader.SizeOfCode, TYPE.INTEGER, HINT.DATA_TYPE);
+                        Send(context, NAME.TYPE.VARIABLE, level + 2, "[[File Alignment]]", data.ImageNtHeaders.OptionalHeader.FileAlignment, TYPE.INTEGER, HINT.DATA_TYPE);
+                        Send(context, NAME.TYPE.VARIABLE, level + 2, "[[Section Alignment]]", data.ImageNtHeaders.OptionalHeader.SectionAlignment, TYPE.INTEGER, HINT.DATA_TYPE);
+                        Send(context, NAME.TYPE.VARIABLE, level + 2, "[[Characteristics]]", __GetDllCharacteristics(data.ImageNtHeaders.OptionalHeader.DllCharacteristics), TYPE.FLAGS, HINT.DATA_TYPE);
+                        Send(context, NAME.TYPE.VARIABLE, level + 2, "[[Subsystem]]", __GetSubsystem(data.ImageNtHeaders.OptionalHeader.Subsystem), TYPE.ENUM, HINT.DATA_TYPE);
+                        Send(context, NAME.TYPE.VARIABLE, level + 2, "[[Magic]]", __GetMagic(data.ImageNtHeaders.OptionalHeader.Magic), TYPE.FLAGS, HINT.DATA_TYPE);
+                        Send(context, NAME.TYPE.VARIABLE, level + 2, "[[Loader Flags]]", GetHex(data.ImageNtHeaders.OptionalHeader.LoaderFlags), TYPE.FLAGS, HINT.DATA_TYPE);
+                        Send(context, NAME.TYPE.VARIABLE, level + 2, "[[Number Of]] RVA [[And Sizes]]", data.ImageNtHeaders.OptionalHeader.NumberOfRvaAndSizes, TYPE.INTEGER, HINT.DATA_TYPE);
+                        Send(context, NAME.TYPE.VARIABLE, level + 2, "[[Image Version]]", GetVersion(data.ImageNtHeaders.OptionalHeader.MajorImageVersion, data.ImageNtHeaders.OptionalHeader.MinorImageVersion), TYPE.VERSION, HINT.DATA_TYPE);
+                        Send(context, NAME.TYPE.VARIABLE, level + 2, "[[Linker Version]]", GetVersion(data.ImageNtHeaders.OptionalHeader.MajorLinkerVersion, data.ImageNtHeaders.OptionalHeader.MinorLinkerVersion), TYPE.VERSION, HINT.DATA_TYPE);
+                        Send(context, NAME.TYPE.VARIABLE, level + 2, "[[Subsystem Version]]", GetVersion(data.ImageNtHeaders.OptionalHeader.MajorSubsystemVersion, data.ImageNtHeaders.OptionalHeader.MinorSubsystemVersion), TYPE.VERSION, HINT.DATA_TYPE);
+                        Send(context, NAME.TYPE.VARIABLE, level + 2, "[[Operating System Version]]", GetVersion(data.ImageNtHeaders.OptionalHeader.MajorOperatingSystemVersion, data.ImageNtHeaders.OptionalHeader.MinorOperatingSystemVersion), TYPE.VERSION, HINT.DATA_TYPE);
+                        Send(context, NAME.TYPE.VARIABLE, level + 2, "Win32 [[Version]]", data.ImageNtHeaders.OptionalHeader.Win32VersionValue, TYPE.INTEGER, HINT.DATA_TYPE);
                     }
                 }
                 {
-                    Send(context, level + 1, NAME.TYPE.INFO, "DOS [[Header]]", "", TYPE.STRUCT, HINT.DATA_TYPE);
+                    Send(context, NAME.TYPE.INFO, level + 1, "DOS [[Header]]", "", TYPE.STRUCT, HINT.DATA_TYPE);
                     if (data.ImageDosHeader != null)
                     {
-                        Send(context, level + 2, NAME.TYPE.VARIABLE, "oeminfo", data.ImageDosHeader.e_oeminfo, TYPE.INTEGER, HINT.DATA_TYPE);
-                        Send(context, level + 2, NAME.TYPE.VARIABLE, "oemid", data.ImageDosHeader.e_oemid, TYPE.INTEGER, HINT.DATA_TYPE);
-                        Send(context, level + 2, NAME.TYPE.VARIABLE, "ovno", data.ImageDosHeader.e_ovno, TYPE.INTEGER, HINT.DATA_TYPE);
-                        Send(context, level + 2, NAME.TYPE.VARIABLE, "lfarlc", data.ImageDosHeader.e_lfarlc, TYPE.INTEGER, HINT.DATA_TYPE);
-                        Send(context, level + 2, NAME.TYPE.VARIABLE, "cs", data.ImageDosHeader.e_cs, TYPE.INTEGER, HINT.DATA_TYPE);
-                        Send(context, level + 2, NAME.TYPE.VARIABLE, "ip", data.ImageDosHeader.e_ip, TYPE.INTEGER, HINT.DATA_TYPE);
-                        Send(context, level + 2, NAME.TYPE.VARIABLE, "csum", data.ImageDosHeader.e_csum, TYPE.INTEGER, HINT.DATA_TYPE);
-                        Send(context, level + 2, NAME.TYPE.VARIABLE, "sp", data.ImageDosHeader.e_sp, TYPE.INTEGER, HINT.DATA_TYPE);
-                        Send(context, level + 2, NAME.TYPE.VARIABLE, "ss", data.ImageDosHeader.e_ss, TYPE.INTEGER, HINT.DATA_TYPE);
-                        Send(context, level + 2, NAME.TYPE.VARIABLE, "maxalloc", data.ImageDosHeader.e_maxalloc, TYPE.INTEGER, HINT.DATA_TYPE);
-                        Send(context, level + 2, NAME.TYPE.VARIABLE, "minalloc", data.ImageDosHeader.e_minalloc, TYPE.INTEGER, HINT.DATA_TYPE);
-                        Send(context, level + 2, NAME.TYPE.VARIABLE, "cparhdr", data.ImageDosHeader.e_cparhdr, TYPE.INTEGER, HINT.DATA_TYPE);
-                        Send(context, level + 2, NAME.TYPE.VARIABLE, "crlc", data.ImageDosHeader.e_crlc, TYPE.INTEGER, HINT.DATA_TYPE);
-                        Send(context, level + 2, NAME.TYPE.VARIABLE, "cp", data.ImageDosHeader.e_cp, TYPE.INTEGER, HINT.DATA_TYPE);
-                        Send(context, level + 2, NAME.TYPE.VARIABLE, "cblp", data.ImageDosHeader.e_cblp, TYPE.INTEGER, HINT.DATA_TYPE);
-                        Send(context, level + 2, NAME.TYPE.VARIABLE, "magic", __GetMagic(data.ImageDosHeader.e_magic), TYPE.FLAGS, HINT.DATA_TYPE);
-                        Send(context, level + 2, NAME.TYPE.VARIABLE, "lfanew", data.ImageDosHeader.e_lfanew, TYPE.INTEGER, HINT.DATA_TYPE);
+                        Send(context, NAME.TYPE.VARIABLE, level + 2, "oeminfo", data.ImageDosHeader.e_oeminfo, TYPE.INTEGER, HINT.DATA_TYPE);
+                        Send(context, NAME.TYPE.VARIABLE, level + 2, "oemid", data.ImageDosHeader.e_oemid, TYPE.INTEGER, HINT.DATA_TYPE);
+                        Send(context, NAME.TYPE.VARIABLE, level + 2, "ovno", data.ImageDosHeader.e_ovno, TYPE.INTEGER, HINT.DATA_TYPE);
+                        Send(context, NAME.TYPE.VARIABLE, level + 2, "lfarlc", data.ImageDosHeader.e_lfarlc, TYPE.INTEGER, HINT.DATA_TYPE);
+                        Send(context, NAME.TYPE.VARIABLE, level + 2, "cs", data.ImageDosHeader.e_cs, TYPE.INTEGER, HINT.DATA_TYPE);
+                        Send(context, NAME.TYPE.VARIABLE, level + 2, "ip", data.ImageDosHeader.e_ip, TYPE.INTEGER, HINT.DATA_TYPE);
+                        Send(context, NAME.TYPE.VARIABLE, level + 2, "csum", data.ImageDosHeader.e_csum, TYPE.INTEGER, HINT.DATA_TYPE);
+                        Send(context, NAME.TYPE.VARIABLE, level + 2, "sp", data.ImageDosHeader.e_sp, TYPE.INTEGER, HINT.DATA_TYPE);
+                        Send(context, NAME.TYPE.VARIABLE, level + 2, "ss", data.ImageDosHeader.e_ss, TYPE.INTEGER, HINT.DATA_TYPE);
+                        Send(context, NAME.TYPE.VARIABLE, level + 2, "maxalloc", data.ImageDosHeader.e_maxalloc, TYPE.INTEGER, HINT.DATA_TYPE);
+                        Send(context, NAME.TYPE.VARIABLE, level + 2, "minalloc", data.ImageDosHeader.e_minalloc, TYPE.INTEGER, HINT.DATA_TYPE);
+                        Send(context, NAME.TYPE.VARIABLE, level + 2, "cparhdr", data.ImageDosHeader.e_cparhdr, TYPE.INTEGER, HINT.DATA_TYPE);
+                        Send(context, NAME.TYPE.VARIABLE, level + 2, "crlc", data.ImageDosHeader.e_crlc, TYPE.INTEGER, HINT.DATA_TYPE);
+                        Send(context, NAME.TYPE.VARIABLE, level + 2, "cp", data.ImageDosHeader.e_cp, TYPE.INTEGER, HINT.DATA_TYPE);
+                        Send(context, NAME.TYPE.VARIABLE, level + 2, "cblp", data.ImageDosHeader.e_cblp, TYPE.INTEGER, HINT.DATA_TYPE);
+                        Send(context, NAME.TYPE.VARIABLE, level + 2, "magic", __GetMagic(data.ImageDosHeader.e_magic), TYPE.FLAGS, HINT.DATA_TYPE);
+                        Send(context, NAME.TYPE.VARIABLE, level + 2, "lfanew", data.ImageDosHeader.e_lfanew, TYPE.INTEGER, HINT.DATA_TYPE);
                     }
                 }
             }
@@ -324,7 +325,7 @@ namespace resource.preview
             static public void Execute(atom.Trace context, int level, PeFile data)
             {
                 // TODO: Implement visualization of .NET metadata
-                //Send(context, level, NAME.TYPE.FOLDER, "[[Metadata]]", "");
+                //Send(context, NAME.TYPE.FOLDER, level, "[[Metadata]]", "");
             }
         }
 
@@ -334,24 +335,24 @@ namespace resource.preview
             {
                 if ((data.ExportedFunctions != null) && (data.ExportedFunctions.Length > 0) && data.HasValidExportDir)
                 {
-                    Send(context, level, NAME.TYPE.FOLDER, "[[Export Functions]]", "", GetArraySize(data.ExportedFunctions), HINT.EMPTY);
+                    Send(context, NAME.TYPE.FOLDER, level, "[[Export Functions]]", "", GetArraySize(data.ExportedFunctions), HINT.EMPTY);
                     foreach (var a_Context in data.ExportedFunctions)
                     {
-                        Send(context, level + 1, (a_Context.HasName ? NAME.TYPE.FUNCTION : NAME.TYPE.WARNING), GetFunctionName(a_Context.Name, a_Context.HasName), "", TYPE.FUNCTION, HINT.DATA_TYPE, NAME.STATE.NONE, "");
+                        Send(context, (a_Context.HasName ? NAME.TYPE.FUNCTION : NAME.TYPE.WARNING), level + 1, GetFunctionName(a_Context.Name, a_Context.HasName), "", TYPE.FUNCTION, HINT.DATA_TYPE, NAME.STATE.NONE, "");
                         if (GetState() == STATE.CANCEL)
                         {
                             return;
                         }
                         if (a_Context.HasForward)
                         {
-                            Send(context, level + 2, NAME.TYPE.VARIABLE, "[[Forward Name]]", a_Context.ForwardName, TYPE.STRING, HINT.DATA_TYPE);
+                            Send(context, NAME.TYPE.VARIABLE, level + 2, "[[Forward Name]]", a_Context.ForwardName, TYPE.STRING, HINT.DATA_TYPE);
                         }
                         {
-                            Send(context, level + 2, NAME.TYPE.VARIABLE, "[[Address]]", GetHex(a_Context.Address), TYPE.POINTER, HINT.DATA_TYPE);
+                            Send(context, NAME.TYPE.VARIABLE, level + 2, "[[Address]]", GetHex(a_Context.Address), TYPE.POINTER, HINT.DATA_TYPE);
                         }
                         if (a_Context.HasOrdinal)
                         {
-                            Send(context, level + 2, NAME.TYPE.VARIABLE, "[[Ordinal]]", a_Context.Ordinal, TYPE.INTEGER, HINT.DATA_TYPE);
+                            Send(context, NAME.TYPE.VARIABLE, level + 2, "[[Ordinal]]", a_Context.Ordinal, TYPE.INTEGER, HINT.DATA_TYPE);
                         }
                     }
                 }
@@ -364,7 +365,7 @@ namespace resource.preview
             {
                 if ((data.ImportedFunctions != null) && (data.ImportedFunctions.Length > 0) && data.HasValidImportDir)
                 {
-                    Send(context, level, NAME.TYPE.FOLDER, "[[Import Functions]]", "", GetArraySize(data.ImportedFunctions), HINT.EMPTY);
+                    Send(context, NAME.TYPE.FOLDER, level, "[[Import Functions]]", "", GetArraySize(data.ImportedFunctions), HINT.EMPTY);
                     foreach (var a_Context in data.ImportedFunctions)
                     {
                         var a_Name = GetFunctionName(a_Context.Name, true);
@@ -374,14 +375,14 @@ namespace resource.preview
                         }
                         if (string.IsNullOrEmpty(a_Name) == false)
                         {
-                            Send(context, level + 1, (string.IsNullOrEmpty(a_Context.Name) ? NAME.TYPE.WARNING : NAME.TYPE.FUNCTION), a_Name, "", GetModuleName(a_Context.DLL), HINT.MODULE_NAME, NAME.STATE.NONE, a_Context.DLL);
+                            Send(context, (string.IsNullOrEmpty(a_Context.Name) ? NAME.TYPE.WARNING : NAME.TYPE.FUNCTION), level + 1, a_Name, "", GetModuleName(a_Context.DLL), HINT.MODULE_NAME, NAME.STATE.NONE, a_Context.DLL);
                             if (a_Name != a_Context.Name)
                             {
-                                Send(context, level + 2, NAME.TYPE.VARIABLE, "[[Name]]", a_Context.Name, TYPE.STRING, HINT.DATA_TYPE);
+                                Send(context, NAME.TYPE.VARIABLE, level + 2, "[[Name]]", a_Context.Name, TYPE.STRING, HINT.DATA_TYPE);
                             }
                             {
-                                Send(context, level + 2, NAME.TYPE.VARIABLE, "[[Hint]]", a_Context.Hint, TYPE.INTEGER, HINT.DATA_TYPE);
-                                Send(context, level + 2, NAME.TYPE.VARIABLE, "IAT [[Offset]]", a_Context.IATOffset, TYPE.INTEGER, HINT.DATA_TYPE);
+                                Send(context, NAME.TYPE.VARIABLE, level + 2, "[[Hint]]", a_Context.Hint, TYPE.INTEGER, HINT.DATA_TYPE);
+                                Send(context, NAME.TYPE.VARIABLE, level + 2, "IAT [[Offset]]", a_Context.IATOffset, TYPE.INTEGER, HINT.DATA_TYPE);
                             }
                         }
                     }
@@ -397,7 +398,7 @@ namespace resource.preview
                 var a_Count = __GetCount(data);
                 if (a_Count > 0)
                 {
-                    Send(context, level, NAME.TYPE.FOLDER, "[[Import Modules]]", "", GetArraySize(a_Count), HINT.EMPTY);
+                    Send(context, NAME.TYPE.FOLDER, level, "[[Import Modules]]", "", GetArraySize(a_Count), HINT.EMPTY);
                     foreach (var a_Context1 in data.ImportedFunctions)
                     {
                         if (GetState() == STATE.CANCEL)
@@ -413,7 +414,7 @@ namespace resource.preview
                             continue;
                         }
                         {
-                            Send(context, level + 1, NAME.TYPE.FILE, a_Context1.DLL, "", "[[Module]]", HINT.DATA_TYPE, NAME.STATE.NONE, a_Context1.DLL);
+                            Send(context, NAME.TYPE.FILE, level + 1, a_Context1.DLL, "", "[[Module]]", HINT.DATA_TYPE, NAME.STATE.NONE, a_Context1.DLL);
                         }
                         {
                             a_Context += a_Context1.DLL.ToUpper() + "\n";
@@ -468,7 +469,7 @@ namespace resource.preview
                     (data.ImageComDescriptor != null);
                 if (a_IsFound)
                 {
-                    Send(context, level, NAME.TYPE.FOLDER, "[[Directories]]", "");
+                    Send(context, NAME.TYPE.FOLDER, level, "[[Directories]]", "");
                     {
                         __Execute(context, level + 1, data);
                         __Execute(context, level + 1, data.ImageDebugDirectory);
@@ -490,12 +491,12 @@ namespace resource.preview
             {
                 if (data != null)
                 {
-                    Send(context, level, NAME.TYPE.FOLDER, "[[Security]]", "", TYPE.DIRECTORY, HINT.DATA_TYPE);
+                    Send(context, NAME.TYPE.FOLDER, level, "[[Security]]", "", TYPE.DIRECTORY, HINT.DATA_TYPE);
                     {
-                        Send(context, level + 1, NAME.TYPE.VARIABLE, "SHA256", data.SHA256, TYPE.STRING, HINT.DATA_TYPE);
-                        Send(context, level + 1, NAME.TYPE.VARIABLE, "SHA1", data.SHA1, TYPE.STRING, HINT.DATA_TYPE);
-                        Send(context, level + 1, NAME.TYPE.VARIABLE, "MD5", data.MD5, TYPE.STRING, HINT.DATA_TYPE);
-                        Send(context, level + 1, NAME.TYPE.VARIABLE, "ImpHash", data.ImpHash, TYPE.STRING, HINT.DATA_TYPE);
+                        Send(context, NAME.TYPE.VARIABLE, level + 1, "SHA256", data.SHA256, TYPE.STRING, HINT.DATA_TYPE);
+                        Send(context, NAME.TYPE.VARIABLE, level + 1, "SHA1", data.SHA1, TYPE.STRING, HINT.DATA_TYPE);
+                        Send(context, NAME.TYPE.VARIABLE, level + 1, "MD5", data.MD5, TYPE.STRING, HINT.DATA_TYPE);
+                        Send(context, NAME.TYPE.VARIABLE, level + 1, "ImpHash", data.ImpHash, TYPE.STRING, HINT.DATA_TYPE);
                     }
                 }
             }
@@ -504,30 +505,30 @@ namespace resource.preview
             {
                 if (data != null)
                 {
-                    Send(context, level, NAME.TYPE.FOLDER, "[[Debug]]", "", GetArraySize(data.Length), HINT.EMPTY);
+                    Send(context, NAME.TYPE.FOLDER, level, "[[Debug]]", "", GetArraySize(data.Length), HINT.EMPTY);
                     foreach (var a_Context in data)
                     {
-                        Send(context, level + 1, NAME.TYPE.INFO, GetHex(a_Context.PointerToRawData), "", TYPE.STRUCT, HINT.DATA_TYPE);
+                        Send(context, NAME.TYPE.INFO, level + 1, GetHex(a_Context.PointerToRawData), "", TYPE.STRUCT, HINT.DATA_TYPE);
                         if (GetState() == STATE.CANCEL)
                         {
                             return;
                         }
                         else
                         {
-                            Send(context, level + 2, NAME.TYPE.VARIABLE, "[[TimeStamp]]", GetHex(a_Context.TimeDateStamp), TYPE.INTEGER, HINT.DATA_TYPE);
-                            Send(context, level + 2, NAME.TYPE.VARIABLE, "[[Version]]", GetVersion(a_Context.MajorVersion, a_Context.MinorVersion), TYPE.VERSION, HINT.DATA_TYPE);
-                            Send(context, level + 2, NAME.TYPE.VARIABLE, "[[Type]]", a_Context.Type, TYPE.INTEGER, HINT.DATA_TYPE);
-                            Send(context, level + 2, NAME.TYPE.VARIABLE, "[[Size Of Data]]", a_Context.SizeOfData, TYPE.INTEGER, HINT.DATA_TYPE);
-                            Send(context, level + 2, NAME.TYPE.VARIABLE, "[[Address Of Raw Data]]", GetHex(a_Context.AddressOfRawData), TYPE.POINTER, HINT.DATA_TYPE);
-                            Send(context, level + 2, NAME.TYPE.VARIABLE, "[[Pointer To Raw Data]]", GetHex(a_Context.PointerToRawData), TYPE.POINTER, HINT.DATA_TYPE);
-                            Send(context, level + 2, NAME.TYPE.VARIABLE, "[[Characteristics]]", GetHex(a_Context.Characteristics), TYPE.FLAGS, HINT.DATA_TYPE);
+                            Send(context, NAME.TYPE.VARIABLE, level + 2, "[[TimeStamp]]", GetHex(a_Context.TimeDateStamp), TYPE.INTEGER, HINT.DATA_TYPE);
+                            Send(context, NAME.TYPE.VARIABLE, level + 2, "[[Version]]", GetVersion(a_Context.MajorVersion, a_Context.MinorVersion), TYPE.VERSION, HINT.DATA_TYPE);
+                            Send(context, NAME.TYPE.VARIABLE, level + 2, "[[Type]]", a_Context.Type, TYPE.INTEGER, HINT.DATA_TYPE);
+                            Send(context, NAME.TYPE.VARIABLE, level + 2, "[[Size Of Data]]", a_Context.SizeOfData, TYPE.INTEGER, HINT.DATA_TYPE);
+                            Send(context, NAME.TYPE.VARIABLE, level + 2, "[[Address Of Raw Data]]", GetHex(a_Context.AddressOfRawData), TYPE.POINTER, HINT.DATA_TYPE);
+                            Send(context, NAME.TYPE.VARIABLE, level + 2, "[[Pointer To Raw Data]]", GetHex(a_Context.PointerToRawData), TYPE.POINTER, HINT.DATA_TYPE);
+                            Send(context, NAME.TYPE.VARIABLE, level + 2, "[[Characteristics]]", GetHex(a_Context.Characteristics), TYPE.FLAGS, HINT.DATA_TYPE);
                         }
                         if (a_Context.CvInfoPdb70 != null)
                         {
-                            Send(context, level + 2, NAME.TYPE.VARIABLE, "PDB [[File Name]]", a_Context.CvInfoPdb70.PdbFileName, TYPE.STRING, HINT.DATA_TYPE);
-                            Send(context, level + 2, NAME.TYPE.VARIABLE, "[[Signature]]", a_Context.CvInfoPdb70.Signature.ToString().ToUpper(), TYPE.GUID, HINT.DATA_TYPE);
-                            Send(context, level + 2, NAME.TYPE.VARIABLE, "CV [[Signature]]", GetHex(a_Context.CvInfoPdb70.CvSignature), TYPE.INTEGER, HINT.DATA_TYPE);
-                            Send(context, level + 2, NAME.TYPE.VARIABLE, "[[Age]]", a_Context.CvInfoPdb70.Age, TYPE.INTEGER, HINT.DATA_TYPE);
+                            Send(context, NAME.TYPE.VARIABLE, level + 2, "PDB [[File Name]]", a_Context.CvInfoPdb70.PdbFileName, TYPE.STRING, HINT.DATA_TYPE);
+                            Send(context, NAME.TYPE.VARIABLE, level + 2, "[[Signature]]", a_Context.CvInfoPdb70.Signature.ToString().ToUpper(), TYPE.GUID, HINT.DATA_TYPE);
+                            Send(context, NAME.TYPE.VARIABLE, level + 2, "CV [[Signature]]", GetHex(a_Context.CvInfoPdb70.CvSignature), TYPE.INTEGER, HINT.DATA_TYPE);
+                            Send(context, NAME.TYPE.VARIABLE, level + 2, "[[Age]]", a_Context.CvInfoPdb70.Age, TYPE.INTEGER, HINT.DATA_TYPE);
                         }
                     }
                 }
@@ -537,25 +538,25 @@ namespace resource.preview
             {
                 if (data != null)
                 {
-                    Send(context, level, NAME.TYPE.FOLDER, "[[Relocation]]", "", GetArraySize(data.Length), HINT.EMPTY);
+                    Send(context, NAME.TYPE.FOLDER, level, "[[Relocation]]", "", GetArraySize(data.Length), HINT.EMPTY);
                     foreach (var a_Context in data)
                     {
-                        Send(context, level + 1, NAME.TYPE.INFO, GetHex(a_Context.VirtualAddress), "", TYPE.STRUCT, HINT.DATA_TYPE);
+                        Send(context, NAME.TYPE.INFO, level + 1, GetHex(a_Context.VirtualAddress), "", TYPE.STRUCT, HINT.DATA_TYPE);
                         if (GetState() == STATE.CANCEL)
                         {
                             return;
                         }
                         else
                         {
-                            Send(context, level + 2, NAME.TYPE.VARIABLE, "[[Virtual Address]]", GetHex(a_Context.VirtualAddress), TYPE.POINTER, HINT.DATA_TYPE);
-                            Send(context, level + 2, NAME.TYPE.VARIABLE, "[[Size Of Block]]", a_Context.SizeOfBlock, TYPE.INTEGER, HINT.DATA_TYPE);
+                            Send(context, NAME.TYPE.VARIABLE, level + 2, "[[Virtual Address]]", GetHex(a_Context.VirtualAddress), TYPE.POINTER, HINT.DATA_TYPE);
+                            Send(context, NAME.TYPE.VARIABLE, level + 2, "[[Size Of Block]]", a_Context.SizeOfBlock, TYPE.INTEGER, HINT.DATA_TYPE);
                         }
                         if ((a_Context.TypeOffsets != null) && (a_Context.TypeOffsets.Length > 0))
                         {
-                            Send(context, level + 2, NAME.TYPE.INFO, "[[Type Offsets]]", "", GetArraySize(a_Context.TypeOffsets.Length), HINT.EMPTY);
+                            Send(context, NAME.TYPE.INFO, level + 2, "[[Type Offsets]]", "", GetArraySize(a_Context.TypeOffsets.Length), HINT.EMPTY);
                             foreach (var a_Context1 in a_Context.TypeOffsets)
                             {
-                                Send(context, level + 3, NAME.TYPE.VARIABLE, GetHex(a_Context1.Offset), a_Context1.Type.ToString(), TYPE.INTEGER, HINT.DATA_TYPE);
+                                Send(context, NAME.TYPE.VARIABLE, level + 3, GetHex(a_Context1.Offset), a_Context1.Type.ToString(), TYPE.INTEGER, HINT.DATA_TYPE);
                             }
                         }
                     }
@@ -566,13 +567,13 @@ namespace resource.preview
             {
                 if (data != null)
                 {
-                    Send(context, level, NAME.TYPE.FOLDER, "[[Resource]]", "", TYPE.DIRECTORY, HINT.DATA_TYPE);
+                    Send(context, NAME.TYPE.FOLDER, level, "[[Resource]]", "", TYPE.DIRECTORY, HINT.DATA_TYPE);
                     {
-                        Send(context, level + 1, NAME.TYPE.VARIABLE, "[[TimeStamp]]", GetHex(data.TimeDateStamp), TYPE.INTEGER, HINT.DATA_TYPE);
-                        Send(context, level + 1, NAME.TYPE.VARIABLE, "[[Version]]", GetVersion(data.MajorVersion, data.MinorVersion), TYPE.VERSION, HINT.DATA_TYPE);
-                        Send(context, level + 1, NAME.TYPE.VARIABLE, "[[Number Of Name Entries]]", data.NumberOfNameEntries, TYPE.INTEGER, HINT.DATA_TYPE);
-                        Send(context, level + 1, NAME.TYPE.VARIABLE, "[[Number Of Id Entries]]", data.NumberOfIdEntries, TYPE.INTEGER, HINT.DATA_TYPE);
-                        Send(context, level + 1, NAME.TYPE.VARIABLE, "[[Characteristics]]", GetHex(data.Characteristics), TYPE.FLAGS, HINT.DATA_TYPE);
+                        Send(context, NAME.TYPE.VARIABLE, level + 1, "[[TimeStamp]]", GetHex(data.TimeDateStamp), TYPE.INTEGER, HINT.DATA_TYPE);
+                        Send(context, NAME.TYPE.VARIABLE, level + 1, "[[Version]]", GetVersion(data.MajorVersion, data.MinorVersion), TYPE.VERSION, HINT.DATA_TYPE);
+                        Send(context, NAME.TYPE.VARIABLE, level + 1, "[[Number Of Name Entries]]", data.NumberOfNameEntries, TYPE.INTEGER, HINT.DATA_TYPE);
+                        Send(context, NAME.TYPE.VARIABLE, level + 1, "[[Number Of Id Entries]]", data.NumberOfIdEntries, TYPE.INTEGER, HINT.DATA_TYPE);
+                        Send(context, NAME.TYPE.VARIABLE, level + 1, "[[Characteristics]]", GetHex(data.Characteristics), TYPE.FLAGS, HINT.DATA_TYPE);
                     }
                 }
             }
@@ -581,38 +582,38 @@ namespace resource.preview
             {
                 if (data != null)
                 {
-                    Send(context, level, NAME.TYPE.FOLDER, "[[Exceptions]]", "", GetArraySize(data.Length), HINT.EMPTY);
+                    Send(context, NAME.TYPE.FOLDER, level, "[[Exceptions]]", "", GetArraySize(data.Length), HINT.EMPTY);
                     foreach (var a_Context in data)
                     {
-                        Send(context, level + 1, NAME.TYPE.INFO, GetHex(a_Context.FunctionStart), "", TYPE.FUNCTION, HINT.DATA_TYPE);
+                        Send(context, NAME.TYPE.INFO, level + 1, GetHex(a_Context.FunctionStart), "", TYPE.FUNCTION, HINT.DATA_TYPE);
                         if (GetState() == STATE.CANCEL)
                         {
                             return;
                         }
                         else
                         {
-                            Send(context, level + 2, NAME.TYPE.VARIABLE, "[[Function Start]]", GetHex(a_Context.FunctionStart), TYPE.POINTER, HINT.DATA_TYPE);
-                            Send(context, level + 2, NAME.TYPE.VARIABLE, "[[Function End]]", GetHex(a_Context.FunctionEnd), TYPE.POINTER, HINT.DATA_TYPE);
+                            Send(context, NAME.TYPE.VARIABLE, level + 2, "[[Function Start]]", GetHex(a_Context.FunctionStart), TYPE.POINTER, HINT.DATA_TYPE);
+                            Send(context, NAME.TYPE.VARIABLE, level + 2, "[[Function End]]", GetHex(a_Context.FunctionEnd), TYPE.POINTER, HINT.DATA_TYPE);
                         }
                         if (a_Context.ResolvedUnwindInfo != null)
                         {
-                            Send(context, level + 2, NAME.TYPE.VARIABLE, "[[Version]]", a_Context.ResolvedUnwindInfo.Version, TYPE.INTEGER, HINT.DATA_TYPE);
-                            Send(context, level + 2, NAME.TYPE.VARIABLE, "[[Flags]]", GetHex(a_Context.ResolvedUnwindInfo.Flags), TYPE.FLAGS, HINT.DATA_TYPE);
-                            Send(context, level + 2, NAME.TYPE.VARIABLE, "[[Size Of Prolog]]", a_Context.ResolvedUnwindInfo.SizeOfProlog, TYPE.INTEGER, HINT.DATA_TYPE);
-                            Send(context, level + 2, NAME.TYPE.VARIABLE, "[[Count Of Codes]]", a_Context.ResolvedUnwindInfo.CountOfCodes, TYPE.INTEGER, HINT.DATA_TYPE);
-                            Send(context, level + 2, NAME.TYPE.VARIABLE, "[[Frame Register]]", a_Context.ResolvedUnwindInfo.FrameRegister, TYPE.INTEGER, HINT.DATA_TYPE);
-                            Send(context, level + 2, NAME.TYPE.VARIABLE, "[[Frame Offset]]", a_Context.ResolvedUnwindInfo.FrameOffset, TYPE.INTEGER, HINT.DATA_TYPE);
-                            Send(context, level + 2, NAME.TYPE.VARIABLE, "[[Exception Handler]]", GetHex(a_Context.ResolvedUnwindInfo.ExceptionHandler), TYPE.INTEGER, HINT.DATA_TYPE);
-                            Send(context, level + 2, NAME.TYPE.VARIABLE, "[[Function Entry]]", GetHex(a_Context.ResolvedUnwindInfo.FunctionEntry), TYPE.INTEGER, HINT.DATA_TYPE);
+                            Send(context, NAME.TYPE.VARIABLE, level + 2, "[[Version]]", a_Context.ResolvedUnwindInfo.Version, TYPE.INTEGER, HINT.DATA_TYPE);
+                            Send(context, NAME.TYPE.VARIABLE, level + 2, "[[Flags]]", GetHex(a_Context.ResolvedUnwindInfo.Flags), TYPE.FLAGS, HINT.DATA_TYPE);
+                            Send(context, NAME.TYPE.VARIABLE, level + 2, "[[Size Of Prolog]]", a_Context.ResolvedUnwindInfo.SizeOfProlog, TYPE.INTEGER, HINT.DATA_TYPE);
+                            Send(context, NAME.TYPE.VARIABLE, level + 2, "[[Count Of Codes]]", a_Context.ResolvedUnwindInfo.CountOfCodes, TYPE.INTEGER, HINT.DATA_TYPE);
+                            Send(context, NAME.TYPE.VARIABLE, level + 2, "[[Frame Register]]", a_Context.ResolvedUnwindInfo.FrameRegister, TYPE.INTEGER, HINT.DATA_TYPE);
+                            Send(context, NAME.TYPE.VARIABLE, level + 2, "[[Frame Offset]]", a_Context.ResolvedUnwindInfo.FrameOffset, TYPE.INTEGER, HINT.DATA_TYPE);
+                            Send(context, NAME.TYPE.VARIABLE, level + 2, "[[Exception Handler]]", GetHex(a_Context.ResolvedUnwindInfo.ExceptionHandler), TYPE.INTEGER, HINT.DATA_TYPE);
+                            Send(context, NAME.TYPE.VARIABLE, level + 2, "[[Function Entry]]", GetHex(a_Context.ResolvedUnwindInfo.FunctionEntry), TYPE.INTEGER, HINT.DATA_TYPE);
                         }
                         if ((a_Context.ResolvedUnwindInfo != null) && (a_Context.ResolvedUnwindInfo.UnwindCode != null) && (a_Context.ResolvedUnwindInfo.UnwindCode.Length > 0))
                         {
                             foreach (var a_Context1 in a_Context.ResolvedUnwindInfo.UnwindCode)
                             {
-                                Send(context, level + 3, NAME.TYPE.VARIABLE, "[[Code Offset]]", a_Context1.CodeOffset, TYPE.INTEGER, HINT.DATA_TYPE);
-                                Send(context, level + 3, NAME.TYPE.VARIABLE, "[[Frame Offset]]", a_Context1.FrameOffset, TYPE.INTEGER, HINT.DATA_TYPE);
-                                Send(context, level + 3, NAME.TYPE.VARIABLE, "OP [[Info]]", a_Context1.Opinfo, TYPE.INTEGER, HINT.DATA_TYPE);
-                                Send(context, level + 3, NAME.TYPE.VARIABLE, "OP [[Unwind]]", a_Context1.UnwindOp, TYPE.INTEGER, HINT.DATA_TYPE);
+                                Send(context, NAME.TYPE.VARIABLE, level + 3, "[[Code Offset]]", a_Context1.CodeOffset, TYPE.INTEGER, HINT.DATA_TYPE);
+                                Send(context, NAME.TYPE.VARIABLE, level + 3, "[[Frame Offset]]", a_Context1.FrameOffset, TYPE.INTEGER, HINT.DATA_TYPE);
+                                Send(context, NAME.TYPE.VARIABLE, level + 3, "OP [[Info]]", a_Context1.Opinfo, TYPE.INTEGER, HINT.DATA_TYPE);
+                                Send(context, NAME.TYPE.VARIABLE, level + 3, "OP [[Unwind]]", a_Context1.UnwindOp, TYPE.INTEGER, HINT.DATA_TYPE);
                             }
                         }
                     }
@@ -623,26 +624,26 @@ namespace resource.preview
             {
                 if (data != null)
                 {
-                    Send(context, level, NAME.TYPE.FOLDER, "[[Thread Local Storage]]", "", TYPE.DIRECTORY, HINT.DATA_TYPE);
+                    Send(context, NAME.TYPE.FOLDER, level, "[[Thread Local Storage]]", "", TYPE.DIRECTORY, HINT.DATA_TYPE);
                     if (GetState() == STATE.CANCEL)
                     {
                         return;
                     }
                     else
                     {
-                        Send(context, level + 1, NAME.TYPE.VARIABLE, "[[Start Address Of Raw Data]]", GetHex(data.StartAddressOfRawData), TYPE.POINTER, HINT.DATA_TYPE);
-                        Send(context, level + 1, NAME.TYPE.VARIABLE, "[[End Address Of Raw Data]]", GetHex(data.EndAddressOfRawData), TYPE.POINTER, HINT.DATA_TYPE);
-                        Send(context, level + 1, NAME.TYPE.VARIABLE, "[[Address Of Index]]", GetHex(data.AddressOfIndex), TYPE.POINTER, HINT.DATA_TYPE);
-                        Send(context, level + 1, NAME.TYPE.VARIABLE, "[[Address Of CallBacks]]", GetHex(data.AddressOfCallBacks), TYPE.POINTER, HINT.DATA_TYPE);
-                        Send(context, level + 1, NAME.TYPE.VARIABLE, "[[Size Of Zero Fill]]", data.SizeOfZeroFill, TYPE.INTEGER, HINT.DATA_TYPE);
-                        Send(context, level + 1, NAME.TYPE.VARIABLE, "[[Characteristics]]", GetHex(data.Characteristics), TYPE.FLAGS, HINT.DATA_TYPE);
+                        Send(context, NAME.TYPE.VARIABLE, level + 1, "[[Start Address Of Raw Data]]", GetHex(data.StartAddressOfRawData), TYPE.POINTER, HINT.DATA_TYPE);
+                        Send(context, NAME.TYPE.VARIABLE, level + 1, "[[End Address Of Raw Data]]", GetHex(data.EndAddressOfRawData), TYPE.POINTER, HINT.DATA_TYPE);
+                        Send(context, NAME.TYPE.VARIABLE, level + 1, "[[Address Of Index]]", GetHex(data.AddressOfIndex), TYPE.POINTER, HINT.DATA_TYPE);
+                        Send(context, NAME.TYPE.VARIABLE, level + 1, "[[Address Of CallBacks]]", GetHex(data.AddressOfCallBacks), TYPE.POINTER, HINT.DATA_TYPE);
+                        Send(context, NAME.TYPE.VARIABLE, level + 1, "[[Size Of Zero Fill]]", data.SizeOfZeroFill, TYPE.INTEGER, HINT.DATA_TYPE);
+                        Send(context, NAME.TYPE.VARIABLE, level + 1, "[[Characteristics]]", GetHex(data.Characteristics), TYPE.FLAGS, HINT.DATA_TYPE);
                     }
                     if ((data.TlsCallbacks != null) && (data.TlsCallbacks.Length > 0))
                     {
-                        Send(context, level + 1, NAME.TYPE.INFO, "[[Callbacks]]", "", GetArraySize(data.TlsCallbacks.Length), HINT.EMPTY);
+                        Send(context, NAME.TYPE.INFO, level + 1, "[[Callbacks]]", "", GetArraySize(data.TlsCallbacks.Length), HINT.EMPTY);
                         foreach (var a_Context in data.TlsCallbacks)
                         {
-                            Send(context, level + 2, NAME.TYPE.VARIABLE, "[[Callback]]", GetHex(a_Context.Callback), TYPE.POINTER, HINT.DATA_TYPE);
+                            Send(context, NAME.TYPE.VARIABLE, level + 2, "[[Callback]]", GetHex(a_Context.Callback), TYPE.POINTER, HINT.DATA_TYPE);
                         }
                     }
                 }
@@ -652,32 +653,32 @@ namespace resource.preview
             {
                 if (data != null)
                 {
-                    Send(context, level, NAME.TYPE.FOLDER, "[[Load Config]]", "", TYPE.DIRECTORY, HINT.DATA_TYPE);
+                    Send(context, NAME.TYPE.FOLDER, level, "[[Load Config]]", "", TYPE.DIRECTORY, HINT.DATA_TYPE);
                     {
-                        Send(context, level + 1, NAME.TYPE.VARIABLE, "[[TimeStamp]]", GetHex(data.TimeDateStamp), TYPE.INTEGER, HINT.DATA_TYPE);
-                        Send(context, level + 1, NAME.TYPE.VARIABLE, "[[Version]]", GetVersion(data.MajorVesion, data.MinorVersion), TYPE.VERSION, HINT.DATA_TYPE);
-                        Send(context, level + 1, NAME.TYPE.VARIABLE, "[[Size]]", data.Size, TYPE.INTEGER, HINT.DATA_TYPE);
-                        Send(context, level + 1, NAME.TYPE.VARIABLE, "[[Guard]] CF [[Function Table]]", GetHex(data.GuardCFFunctionTable), TYPE.POINTER, HINT.DATA_TYPE);
-                        Send(context, level + 1, NAME.TYPE.VARIABLE, "[[Guard]] CF [[Check Function Pointer]]", GetHex(data.GuardCFCheckFunctionPointer), TYPE.POINTER, HINT.DATA_TYPE);
-                        Send(context, level + 1, NAME.TYPE.VARIABLE, "[[Guard]] CF [[Function Count]]", data.GuardCFFunctionCount, TYPE.INTEGER, HINT.DATA_TYPE);
-                        Send(context, level + 1, NAME.TYPE.VARIABLE, "SE [[Handler Count]]", data.SEHandlerCount, TYPE.INTEGER, HINT.DATA_TYPE);
-                        Send(context, level + 1, NAME.TYPE.VARIABLE, "SE [[Handler Table]]", data.SEHandlerTable, TYPE.INTEGER, HINT.DATA_TYPE);
-                        Send(context, level + 1, NAME.TYPE.VARIABLE, "[[Security Coockie]]", GetHex(data.SecurityCoockie), TYPE.INTEGER, HINT.DATA_TYPE);
-                        Send(context, level + 1, NAME.TYPE.VARIABLE, "[[Edit List]]", data.EditList, TYPE.INTEGER, HINT.DATA_TYPE);
-                        Send(context, level + 1, NAME.TYPE.VARIABLE, "CSD [[Version]]", data.CSDVersion, TYPE.INTEGER, HINT.DATA_TYPE);
-                        Send(context, level + 1, NAME.TYPE.VARIABLE, "[[Process Affinity Mask]]", data.ProcessAffinityMask, TYPE.INTEGER, HINT.DATA_TYPE);
-                        Send(context, level + 1, NAME.TYPE.VARIABLE, "[[Maximum Allocation Size]]", data.MaximumAllocationSize, TYPE.INTEGER, HINT.DATA_TYPE);
-                        Send(context, level + 1, NAME.TYPE.VARIABLE, "[[Lock Prefix Table]]", data.LockPrefixTable, TYPE.INTEGER, HINT.DATA_TYPE);
-                        Send(context, level + 1, NAME.TYPE.VARIABLE, "[[Virtual Memory Threshold]]", data.VirtualMemoryThreshold, TYPE.INTEGER, HINT.DATA_TYPE);
-                        Send(context, level + 1, NAME.TYPE.VARIABLE, "[[DeCommit Total Free Threshold]]", data.DeCommitTotalFreeThreshold, TYPE.INTEGER, HINT.DATA_TYPE);
-                        Send(context, level + 1, NAME.TYPE.VARIABLE, "[[DeCommit Free Block Threshold]]", data.DeCommitFreeBlockThreshold, TYPE.INTEGER, HINT.DATA_TYPE);
-                        Send(context, level + 1, NAME.TYPE.VARIABLE, "[[Critical Section Default Timeout]]", data.CriticalSectionDefaultTimeout, TYPE.INTEGER, HINT.DATA_TYPE);
-                        Send(context, level + 1, NAME.TYPE.VARIABLE, "[[Global Flags Set]]", data.GlobalFlagsSet, TYPE.INTEGER, HINT.DATA_TYPE);
-                        Send(context, level + 1, NAME.TYPE.VARIABLE, "[[Global Flags Clear]]", data.GlobalFlagsClear, TYPE.INTEGER, HINT.DATA_TYPE);
-                        Send(context, level + 1, NAME.TYPE.VARIABLE, "[[Process Heap Flags]]", GetHex(data.ProcessHeapFlags), TYPE.FLAGS, HINT.DATA_TYPE);
-                        Send(context, level + 1, NAME.TYPE.VARIABLE, "[[Guard Flags]]", GetHex(data.GuardFlags), TYPE.FLAGS, HINT.DATA_TYPE);
-                        Send(context, level + 1, NAME.TYPE.VARIABLE, "[[Reserved1]]", GetHex(data.Reserved1), TYPE.INTEGER, HINT.DATA_TYPE);
-                        Send(context, level + 1, NAME.TYPE.VARIABLE, "[[Reserved2]]", GetHex(data.Reserved2), TYPE.INTEGER, HINT.DATA_TYPE);
+                        Send(context, NAME.TYPE.VARIABLE, level + 1, "[[TimeStamp]]", GetHex(data.TimeDateStamp), TYPE.INTEGER, HINT.DATA_TYPE);
+                        Send(context, NAME.TYPE.VARIABLE, level + 1, "[[Version]]", GetVersion(data.MajorVesion, data.MinorVersion), TYPE.VERSION, HINT.DATA_TYPE);
+                        Send(context, NAME.TYPE.VARIABLE, level + 1, "[[Size]]", data.Size, TYPE.INTEGER, HINT.DATA_TYPE);
+                        Send(context, NAME.TYPE.VARIABLE, level + 1, "[[Guard]] CF [[Function Table]]", GetHex(data.GuardCFFunctionTable), TYPE.POINTER, HINT.DATA_TYPE);
+                        Send(context, NAME.TYPE.VARIABLE, level + 1, "[[Guard]] CF [[Check Function Pointer]]", GetHex(data.GuardCFCheckFunctionPointer), TYPE.POINTER, HINT.DATA_TYPE);
+                        Send(context, NAME.TYPE.VARIABLE, level + 1, "[[Guard]] CF [[Function Count]]", data.GuardCFFunctionCount, TYPE.INTEGER, HINT.DATA_TYPE);
+                        Send(context, NAME.TYPE.VARIABLE, level + 1, "SE [[Handler Count]]", data.SEHandlerCount, TYPE.INTEGER, HINT.DATA_TYPE);
+                        Send(context, NAME.TYPE.VARIABLE, level + 1, "SE [[Handler Table]]", data.SEHandlerTable, TYPE.INTEGER, HINT.DATA_TYPE);
+                        Send(context, NAME.TYPE.VARIABLE, level + 1, "[[Security Coockie]]", GetHex(data.SecurityCoockie), TYPE.INTEGER, HINT.DATA_TYPE);
+                        Send(context, NAME.TYPE.VARIABLE, level + 1, "[[Edit List]]", data.EditList, TYPE.INTEGER, HINT.DATA_TYPE);
+                        Send(context, NAME.TYPE.VARIABLE, level + 1, "CSD [[Version]]", data.CSDVersion, TYPE.INTEGER, HINT.DATA_TYPE);
+                        Send(context, NAME.TYPE.VARIABLE, level + 1, "[[Process Affinity Mask]]", data.ProcessAffinityMask, TYPE.INTEGER, HINT.DATA_TYPE);
+                        Send(context, NAME.TYPE.VARIABLE, level + 1, "[[Maximum Allocation Size]]", data.MaximumAllocationSize, TYPE.INTEGER, HINT.DATA_TYPE);
+                        Send(context, NAME.TYPE.VARIABLE, level + 1, "[[Lock Prefix Table]]", data.LockPrefixTable, TYPE.INTEGER, HINT.DATA_TYPE);
+                        Send(context, NAME.TYPE.VARIABLE, level + 1, "[[Virtual Memory Threshold]]", data.VirtualMemoryThreshold, TYPE.INTEGER, HINT.DATA_TYPE);
+                        Send(context, NAME.TYPE.VARIABLE, level + 1, "[[DeCommit Total Free Threshold]]", data.DeCommitTotalFreeThreshold, TYPE.INTEGER, HINT.DATA_TYPE);
+                        Send(context, NAME.TYPE.VARIABLE, level + 1, "[[DeCommit Free Block Threshold]]", data.DeCommitFreeBlockThreshold, TYPE.INTEGER, HINT.DATA_TYPE);
+                        Send(context, NAME.TYPE.VARIABLE, level + 1, "[[Critical Section Default Timeout]]", data.CriticalSectionDefaultTimeout, TYPE.INTEGER, HINT.DATA_TYPE);
+                        Send(context, NAME.TYPE.VARIABLE, level + 1, "[[Global Flags Set]]", data.GlobalFlagsSet, TYPE.INTEGER, HINT.DATA_TYPE);
+                        Send(context, NAME.TYPE.VARIABLE, level + 1, "[[Global Flags Clear]]", data.GlobalFlagsClear, TYPE.INTEGER, HINT.DATA_TYPE);
+                        Send(context, NAME.TYPE.VARIABLE, level + 1, "[[Process Heap Flags]]", GetHex(data.ProcessHeapFlags), TYPE.FLAGS, HINT.DATA_TYPE);
+                        Send(context, NAME.TYPE.VARIABLE, level + 1, "[[Guard Flags]]", GetHex(data.GuardFlags), TYPE.FLAGS, HINT.DATA_TYPE);
+                        Send(context, NAME.TYPE.VARIABLE, level + 1, "[[Reserved1]]", GetHex(data.Reserved1), TYPE.INTEGER, HINT.DATA_TYPE);
+                        Send(context, NAME.TYPE.VARIABLE, level + 1, "[[Reserved2]]", GetHex(data.Reserved2), TYPE.INTEGER, HINT.DATA_TYPE);
                     }
                 }
             }
@@ -686,18 +687,18 @@ namespace resource.preview
             {
                 if (data != null)
                 {
-                    Send(context, level, NAME.TYPE.FOLDER, "[[Export]]", "", TYPE.DIRECTORY, HINT.DATA_TYPE);
+                    Send(context, NAME.TYPE.FOLDER, level, "[[Export]]", "", TYPE.DIRECTORY, HINT.DATA_TYPE);
                     {
-                        Send(context, level + 1, NAME.TYPE.VARIABLE, "[[TimeStamp]]", GetHex(data.TimeDateStamp), TYPE.INTEGER, HINT.DATA_TYPE);
-                        Send(context, level + 1, NAME.TYPE.VARIABLE, "[[Version]]", GetVersion(data.MajorVersion, data.MinorVersion), TYPE.VERSION, HINT.DATA_TYPE);
-                        Send(context, level + 1, NAME.TYPE.VARIABLE, "[[Name]]", data.Name, TYPE.INTEGER, HINT.DATA_TYPE);
-                        Send(context, level + 1, NAME.TYPE.VARIABLE, "[[Base]]", data.Base, TYPE.INTEGER, HINT.DATA_TYPE);
-                        Send(context, level + 1, NAME.TYPE.VARIABLE, "[[Number Of Functions]]", data.NumberOfFunctions, TYPE.INTEGER, HINT.DATA_TYPE);
-                        Send(context, level + 1, NAME.TYPE.VARIABLE, "[[Number Of Names]]", data.NumberOfNames, TYPE.INTEGER, HINT.DATA_TYPE);
-                        Send(context, level + 1, NAME.TYPE.VARIABLE, "[[Address Of Functions]]", GetHex(data.AddressOfFunctions), TYPE.POINTER, HINT.DATA_TYPE);
-                        Send(context, level + 1, NAME.TYPE.VARIABLE, "[[Address Of Names]]", GetHex(data.AddressOfNames), TYPE.POINTER, HINT.DATA_TYPE);
-                        Send(context, level + 1, NAME.TYPE.VARIABLE, "[[Address Of Name Ordinals]]", GetHex(data.AddressOfNameOrdinals), TYPE.POINTER, HINT.DATA_TYPE);
-                        Send(context, level + 1, NAME.TYPE.VARIABLE, "[[Characteristics]]", GetHex(data.Characteristics), TYPE.FLAGS, HINT.DATA_TYPE);
+                        Send(context, NAME.TYPE.VARIABLE, level + 1, "[[TimeStamp]]", GetHex(data.TimeDateStamp), TYPE.INTEGER, HINT.DATA_TYPE);
+                        Send(context, NAME.TYPE.VARIABLE, level + 1, "[[Version]]", GetVersion(data.MajorVersion, data.MinorVersion), TYPE.VERSION, HINT.DATA_TYPE);
+                        Send(context, NAME.TYPE.VARIABLE, level + 1, "[[Name]]", data.Name, TYPE.INTEGER, HINT.DATA_TYPE);
+                        Send(context, NAME.TYPE.VARIABLE, level + 1, "[[Base]]", data.Base, TYPE.INTEGER, HINT.DATA_TYPE);
+                        Send(context, NAME.TYPE.VARIABLE, level + 1, "[[Number Of Functions]]", data.NumberOfFunctions, TYPE.INTEGER, HINT.DATA_TYPE);
+                        Send(context, NAME.TYPE.VARIABLE, level + 1, "[[Number Of Names]]", data.NumberOfNames, TYPE.INTEGER, HINT.DATA_TYPE);
+                        Send(context, NAME.TYPE.VARIABLE, level + 1, "[[Address Of Functions]]", GetHex(data.AddressOfFunctions), TYPE.POINTER, HINT.DATA_TYPE);
+                        Send(context, NAME.TYPE.VARIABLE, level + 1, "[[Address Of Names]]", GetHex(data.AddressOfNames), TYPE.POINTER, HINT.DATA_TYPE);
+                        Send(context, NAME.TYPE.VARIABLE, level + 1, "[[Address Of Name Ordinals]]", GetHex(data.AddressOfNameOrdinals), TYPE.POINTER, HINT.DATA_TYPE);
+                        Send(context, NAME.TYPE.VARIABLE, level + 1, "[[Characteristics]]", GetHex(data.Characteristics), TYPE.FLAGS, HINT.DATA_TYPE);
                     }
                 }
             }
@@ -706,21 +707,21 @@ namespace resource.preview
             {
                 if (data != null)
                 {
-                    Send(context, level, NAME.TYPE.FOLDER, "[[Import]]", "", GetArraySize(data.Length), HINT.EMPTY);
+                    Send(context, NAME.TYPE.FOLDER, level, "[[Import]]", "", GetArraySize(data.Length), HINT.EMPTY);
                     foreach (var a_Context in data)
                     {
-                        Send(context, level + 1, NAME.TYPE.FOLDER, GetHex(a_Context.Name), "", TYPE.STRUCT, HINT.DATA_TYPE);
+                        Send(context, NAME.TYPE.FOLDER, level + 1, GetHex(a_Context.Name), "", TYPE.STRUCT, HINT.DATA_TYPE);
                         if (GetState() == STATE.CANCEL)
                         {
                             return;
                         }
                         else
                         {
-                            Send(context, level + 2, NAME.TYPE.VARIABLE, "[[TimeStamp]]", GetHex(a_Context.TimeDateStamp), TYPE.INTEGER, HINT.DATA_TYPE);
-                            Send(context, level + 2, NAME.TYPE.VARIABLE, "[[Name]]", GetHex(a_Context.Name), TYPE.POINTER, HINT.DATA_TYPE);
-                            Send(context, level + 2, NAME.TYPE.VARIABLE, "[[Original First Thunk]]", GetHex(a_Context.OriginalFirstThunk), TYPE.POINTER, HINT.DATA_TYPE);
-                            Send(context, level + 2, NAME.TYPE.VARIABLE, "[[Forwarder Chain]]", GetHex(a_Context.ForwarderChain), TYPE.POINTER, HINT.DATA_TYPE);
-                            Send(context, level + 2, NAME.TYPE.VARIABLE, "[[First Thunk]]", GetHex(a_Context.FirstThunk), TYPE.POINTER, HINT.DATA_TYPE);
+                            Send(context, NAME.TYPE.VARIABLE, level + 2, "[[TimeStamp]]", GetHex(a_Context.TimeDateStamp), TYPE.INTEGER, HINT.DATA_TYPE);
+                            Send(context, NAME.TYPE.VARIABLE, level + 2, "[[Name]]", GetHex(a_Context.Name), TYPE.POINTER, HINT.DATA_TYPE);
+                            Send(context, NAME.TYPE.VARIABLE, level + 2, "[[Original First Thunk]]", GetHex(a_Context.OriginalFirstThunk), TYPE.POINTER, HINT.DATA_TYPE);
+                            Send(context, NAME.TYPE.VARIABLE, level + 2, "[[Forwarder Chain]]", GetHex(a_Context.ForwarderChain), TYPE.POINTER, HINT.DATA_TYPE);
+                            Send(context, NAME.TYPE.VARIABLE, level + 2, "[[First Thunk]]", GetHex(a_Context.FirstThunk), TYPE.POINTER, HINT.DATA_TYPE);
                         }
                     }
                 }
@@ -730,11 +731,11 @@ namespace resource.preview
             {
                 if (data != null)
                 {
-                    Send(context, level, NAME.TYPE.FOLDER, "[[Bound Import]]", "", TYPE.DIRECTORY, HINT.DATA_TYPE);
+                    Send(context, NAME.TYPE.FOLDER, level, "[[Bound Import]]", "", TYPE.DIRECTORY, HINT.DATA_TYPE);
                     {
-                        Send(context, level + 1, NAME.TYPE.VARIABLE, "[[TimeStamp]]", GetHex(data.TimeDateStamp), TYPE.INTEGER, HINT.DATA_TYPE);
-                        Send(context, level + 1, NAME.TYPE.VARIABLE, "[[Offset Module Name]]", GetHex(data.OffsetModuleName), TYPE.POINTER, HINT.DATA_TYPE);
-                        Send(context, level + 1, NAME.TYPE.VARIABLE, "[[Number Of Module Forwarder Refs]]", data.NumberOfModuleForwarderRefs, TYPE.INTEGER, HINT.DATA_TYPE);
+                        Send(context, NAME.TYPE.VARIABLE, level + 1, "[[TimeStamp]]", GetHex(data.TimeDateStamp), TYPE.INTEGER, HINT.DATA_TYPE);
+                        Send(context, NAME.TYPE.VARIABLE, level + 1, "[[Offset Module Name]]", GetHex(data.OffsetModuleName), TYPE.POINTER, HINT.DATA_TYPE);
+                        Send(context, NAME.TYPE.VARIABLE, level + 1, "[[Number Of Module Forwarder Refs]]", data.NumberOfModuleForwarderRefs, TYPE.INTEGER, HINT.DATA_TYPE);
                     }
                 }
             }
@@ -743,16 +744,16 @@ namespace resource.preview
             {
                 if (data != null)
                 {
-                    Send(context, level, NAME.TYPE.FOLDER, "[[Delay Import]]", "", TYPE.DIRECTORY, HINT.DATA_TYPE);
+                    Send(context, NAME.TYPE.FOLDER, level, "[[Delay Import]]", "", TYPE.DIRECTORY, HINT.DATA_TYPE);
                     {
-                        Send(context, level + 1, NAME.TYPE.VARIABLE, "[[TimeStamp]]", GetHex(data.dwTimeStamp), TYPE.INTEGER, HINT.DATA_TYPE);
-                        Send(context, level + 1, NAME.TYPE.VARIABLE, "[[Attributes]]", GetHex(data.grAttrs), TYPE.FLAGS, HINT.DATA_TYPE);
-                        Send(context, level + 1, NAME.TYPE.VARIABLE, "[[Name]]", GetHex(data.szName), TYPE.POINTER, HINT.DATA_TYPE);
-                        Send(context, level + 1, NAME.TYPE.VARIABLE, "[[Mod]]", GetHex(data.phmod), TYPE.POINTER, HINT.DATA_TYPE);
-                        Send(context, level + 1, NAME.TYPE.VARIABLE, "[[IAT]]", GetHex(data.pIAT), TYPE.POINTER, HINT.DATA_TYPE);
-                        Send(context, level + 1, NAME.TYPE.VARIABLE, "[[INT]]", GetHex(data.pINT), TYPE.POINTER, HINT.DATA_TYPE);
-                        Send(context, level + 1, NAME.TYPE.VARIABLE, "[[Bound IAT]]", GetHex(data.pBoundIAT), TYPE.POINTER, HINT.DATA_TYPE);
-                        Send(context, level + 1, NAME.TYPE.VARIABLE, "[[Unload IAT]]", GetHex(data.pUnloadIAT), TYPE.POINTER, HINT.DATA_TYPE);
+                        Send(context, NAME.TYPE.VARIABLE, level + 1, "[[TimeStamp]]", GetHex(data.dwTimeStamp), TYPE.INTEGER, HINT.DATA_TYPE);
+                        Send(context, NAME.TYPE.VARIABLE, level + 1, "[[Attributes]]", GetHex(data.grAttrs), TYPE.FLAGS, HINT.DATA_TYPE);
+                        Send(context, NAME.TYPE.VARIABLE, level + 1, "[[Name]]", GetHex(data.szName), TYPE.POINTER, HINT.DATA_TYPE);
+                        Send(context, NAME.TYPE.VARIABLE, level + 1, "[[Mod]]", GetHex(data.phmod), TYPE.POINTER, HINT.DATA_TYPE);
+                        Send(context, NAME.TYPE.VARIABLE, level + 1, "[[IAT]]", GetHex(data.pIAT), TYPE.POINTER, HINT.DATA_TYPE);
+                        Send(context, NAME.TYPE.VARIABLE, level + 1, "[[INT]]", GetHex(data.pINT), TYPE.POINTER, HINT.DATA_TYPE);
+                        Send(context, NAME.TYPE.VARIABLE, level + 1, "[[Bound IAT]]", GetHex(data.pBoundIAT), TYPE.POINTER, HINT.DATA_TYPE);
+                        Send(context, NAME.TYPE.VARIABLE, level + 1, "[[Unload IAT]]", GetHex(data.pUnloadIAT), TYPE.POINTER, HINT.DATA_TYPE);
                     }
                 }
             }
@@ -761,72 +762,72 @@ namespace resource.preview
             {
                 if (data != null)
                 {
-                    Send(context, level, NAME.TYPE.FOLDER, "COM", "", TYPE.DIRECTORY, HINT.DATA_TYPE);
+                    Send(context, NAME.TYPE.FOLDER, level, "COM", "", TYPE.DIRECTORY, HINT.DATA_TYPE);
                     {
-                        Send(context, level + 1, NAME.TYPE.VARIABLE, "[[Runtime Version]]", GetVersion(data.MajorRuntimeVersion, data.MinorRuntimeVersion), TYPE.VERSION, HINT.DATA_TYPE);
-                        Send(context, level + 1, NAME.TYPE.VARIABLE, "[[Flags]]", GetHex(data.Flags), TYPE.FLAGS, HINT.DATA_TYPE);
+                        Send(context, NAME.TYPE.VARIABLE, level + 1, "[[Runtime Version]]", GetVersion(data.MajorRuntimeVersion, data.MinorRuntimeVersion), TYPE.VERSION, HINT.DATA_TYPE);
+                        Send(context, NAME.TYPE.VARIABLE, level + 1, "[[Flags]]", GetHex(data.Flags), TYPE.FLAGS, HINT.DATA_TYPE);
                     }
                     {
-                        Send(context, level + 1, NAME.TYPE.INFO, "[[Entry Point]]", "", TYPE.STRUCT, HINT.DATA_TYPE);
+                        Send(context, NAME.TYPE.INFO, level + 1, "[[Entry Point]]", "", TYPE.STRUCT, HINT.DATA_TYPE);
                         {
-                            Send(context, level + 2, NAME.TYPE.VARIABLE, "[[Token]]", data.EntryPointToken, TYPE.INTEGER, HINT.DATA_TYPE);
-                            Send(context, level + 2, NAME.TYPE.VARIABLE, "[[Relative Virtual Address]]", data.EntryPointRVA, TYPE.INTEGER, HINT.DATA_TYPE);
+                            Send(context, NAME.TYPE.VARIABLE, level + 2, "[[Token]]", data.EntryPointToken, TYPE.INTEGER, HINT.DATA_TYPE);
+                            Send(context, NAME.TYPE.VARIABLE, level + 2, "[[Relative Virtual Address]]", data.EntryPointRVA, TYPE.INTEGER, HINT.DATA_TYPE);
                         }
                     }
                     if (data.MetaData != null)
                     {
-                        Send(context, level + 1, NAME.TYPE.INFO, "[[Metadata]]", "", TYPE.STRUCT, HINT.DATA_TYPE);
+                        Send(context, NAME.TYPE.INFO, level + 1, "[[Metadata]]", "", TYPE.STRUCT, HINT.DATA_TYPE);
                         {
-                            Send(context, level + 2, NAME.TYPE.VARIABLE, "[[Address]]", GetHex(data.MetaData.VirtualAddress), TYPE.POINTER, HINT.DATA_TYPE);
-                            Send(context, level + 2, NAME.TYPE.VARIABLE, "[[Size]]", data.MetaData.Size, TYPE.INTEGER, HINT.DATA_TYPE);
+                            Send(context, NAME.TYPE.VARIABLE, level + 2, "[[Address]]", GetHex(data.MetaData.VirtualAddress), TYPE.POINTER, HINT.DATA_TYPE);
+                            Send(context, NAME.TYPE.VARIABLE, level + 2, "[[Size]]", data.MetaData.Size, TYPE.INTEGER, HINT.DATA_TYPE);
                         }
                     }
                     if (data.Resources != null)
                     {
-                        Send(context, level + 1, NAME.TYPE.INFO, "[[Resources]]", "", TYPE.STRUCT, HINT.DATA_TYPE);
+                        Send(context, NAME.TYPE.INFO, level + 1, "[[Resources]]", "", TYPE.STRUCT, HINT.DATA_TYPE);
                         {
-                            Send(context, level + 2, NAME.TYPE.VARIABLE, "[[Address]]", GetHex(data.Resources.VirtualAddress), TYPE.POINTER, HINT.DATA_TYPE);
-                            Send(context, level + 2, NAME.TYPE.VARIABLE, "[[Size]]", data.Resources.Size, TYPE.INTEGER, HINT.DATA_TYPE);
+                            Send(context, NAME.TYPE.VARIABLE, level + 2, "[[Address]]", GetHex(data.Resources.VirtualAddress), TYPE.POINTER, HINT.DATA_TYPE);
+                            Send(context, NAME.TYPE.VARIABLE, level + 2, "[[Size]]", data.Resources.Size, TYPE.INTEGER, HINT.DATA_TYPE);
                         }
                     }
                     if (data.StrongNameSignature != null)
                     {
-                        Send(context, level + 1, NAME.TYPE.INFO, "[[Strong Name Signature]]", "", TYPE.STRUCT, HINT.DATA_TYPE);
+                        Send(context, NAME.TYPE.INFO, level + 1, "[[Strong Name Signature]]", "", TYPE.STRUCT, HINT.DATA_TYPE);
                         {
-                            Send(context, level + 2, NAME.TYPE.VARIABLE, "[[Address]]", GetHex(data.StrongNameSignature.VirtualAddress), TYPE.POINTER, HINT.DATA_TYPE);
-                            Send(context, level + 2, NAME.TYPE.VARIABLE, "[[Size]]", data.StrongNameSignature.Size, TYPE.INTEGER, HINT.DATA_TYPE);
+                            Send(context, NAME.TYPE.VARIABLE, level + 2, "[[Address]]", GetHex(data.StrongNameSignature.VirtualAddress), TYPE.POINTER, HINT.DATA_TYPE);
+                            Send(context, NAME.TYPE.VARIABLE, level + 2, "[[Size]]", data.StrongNameSignature.Size, TYPE.INTEGER, HINT.DATA_TYPE);
                         }
                     }
                     if (data.CodeManagerTable != null)
                     {
-                        Send(context, level + 1, NAME.TYPE.INFO, "[[Code Manager Table]]", "", TYPE.STRUCT, HINT.DATA_TYPE);
+                        Send(context, NAME.TYPE.INFO, level + 1, "[[Code Manager Table]]", "", TYPE.STRUCT, HINT.DATA_TYPE);
                         {
-                            Send(context, level + 2, NAME.TYPE.VARIABLE, "[[Address]]", GetHex(data.CodeManagerTable.VirtualAddress), TYPE.POINTER, HINT.DATA_TYPE);
-                            Send(context, level + 2, NAME.TYPE.VARIABLE, "[[Size]]", data.CodeManagerTable.Size, TYPE.INTEGER, HINT.DATA_TYPE);
+                            Send(context, NAME.TYPE.VARIABLE, level + 2, "[[Address]]", GetHex(data.CodeManagerTable.VirtualAddress), TYPE.POINTER, HINT.DATA_TYPE);
+                            Send(context, NAME.TYPE.VARIABLE, level + 2, "[[Size]]", data.CodeManagerTable.Size, TYPE.INTEGER, HINT.DATA_TYPE);
                         }
                     }
                     if (data.VTableFixups != null)
                     {
-                        Send(context, level + 1, NAME.TYPE.INFO, "[[Virtual Table Fix Up]]", "", TYPE.STRUCT, HINT.DATA_TYPE);
+                        Send(context, NAME.TYPE.INFO, level + 1, "[[Virtual Table Fix Up]]", "", TYPE.STRUCT, HINT.DATA_TYPE);
                         {
-                            Send(context, level + 2, NAME.TYPE.VARIABLE, "[[Address]]", GetHex(data.VTableFixups.VirtualAddress), TYPE.POINTER, HINT.DATA_TYPE);
-                            Send(context, level + 2, NAME.TYPE.VARIABLE, "[[Size]]", data.VTableFixups.Size, TYPE.INTEGER, HINT.DATA_TYPE);
+                            Send(context, NAME.TYPE.VARIABLE, level + 2, "[[Address]]", GetHex(data.VTableFixups.VirtualAddress), TYPE.POINTER, HINT.DATA_TYPE);
+                            Send(context, NAME.TYPE.VARIABLE, level + 2, "[[Size]]", data.VTableFixups.Size, TYPE.INTEGER, HINT.DATA_TYPE);
                         }
                     }
                     if (data.ExportAddressTableJumps != null)
                     {
-                        Send(context, level + 1, NAME.TYPE.INFO, "[[Export Address Table Jumps]]", "", TYPE.STRUCT, HINT.DATA_TYPE);
+                        Send(context, NAME.TYPE.INFO, level + 1, "[[Export Address Table Jumps]]", "", TYPE.STRUCT, HINT.DATA_TYPE);
                         {
-                            Send(context, level + 2, NAME.TYPE.VARIABLE, "[[Address]]", GetHex(data.ExportAddressTableJumps.VirtualAddress), TYPE.POINTER, HINT.DATA_TYPE);
-                            Send(context, level + 2, NAME.TYPE.VARIABLE, "[[Size]]", data.ExportAddressTableJumps.Size, TYPE.INTEGER, HINT.DATA_TYPE);
+                            Send(context, NAME.TYPE.VARIABLE, level + 2, "[[Address]]", GetHex(data.ExportAddressTableJumps.VirtualAddress), TYPE.POINTER, HINT.DATA_TYPE);
+                            Send(context, NAME.TYPE.VARIABLE, level + 2, "[[Size]]", data.ExportAddressTableJumps.Size, TYPE.INTEGER, HINT.DATA_TYPE);
                         }
                     }
                     if (data.ManagedNativeHeader != null)
                     {
-                        Send(context, level + 1, NAME.TYPE.INFO, "[[Managed Native Header]]", "", TYPE.STRUCT, HINT.DATA_TYPE);
+                        Send(context, NAME.TYPE.INFO, level + 1, "[[Managed Native Header]]", "", TYPE.STRUCT, HINT.DATA_TYPE);
                         {
-                            Send(context, level + 2, NAME.TYPE.VARIABLE, "[[Address]]", GetHex(data.ManagedNativeHeader.VirtualAddress), TYPE.POINTER, HINT.DATA_TYPE);
-                            Send(context, level + 2, NAME.TYPE.VARIABLE, "[[Size]]", data.ManagedNativeHeader.Size, TYPE.INTEGER, HINT.DATA_TYPE);
+                            Send(context, NAME.TYPE.VARIABLE, level + 2, "[[Address]]", GetHex(data.ManagedNativeHeader.VirtualAddress), TYPE.POINTER, HINT.DATA_TYPE);
+                            Send(context, NAME.TYPE.VARIABLE, level + 2, "[[Size]]", data.ManagedNativeHeader.Size, TYPE.INTEGER, HINT.DATA_TYPE);
                         }
                     }
                 }
@@ -837,28 +838,28 @@ namespace resource.preview
         {
             static public void Execute(atom.Trace context, int level, PeFile data)
             {
-                Send(context, level, NAME.TYPE.FOLDER, "[[Sections]]", "", GetArraySize(data.ImageSectionHeaders), HINT.EMPTY);
+                Send(context, NAME.TYPE.FOLDER, level, "[[Sections]]", "", GetArraySize(data.ImageSectionHeaders), HINT.EMPTY);
                 if (data.ImageSectionHeaders != null)
                 {
                     foreach (var a_Context in data.ImageSectionHeaders)
                     {
-                        Send(context, level + 1, NAME.TYPE.INFO, a_Context.NameResolved, "", TYPE.SECTION, HINT.DATA_TYPE);
+                        Send(context, NAME.TYPE.INFO, level + 1, a_Context.NameResolved, "", TYPE.SECTION, HINT.DATA_TYPE);
                         if (GetState() == STATE.CANCEL)
                         {
                             return;
                         }
                         else
                         {
-                            Send(context, level + 2, NAME.TYPE.VARIABLE, "[[Image Base Address]]", GetHex(a_Context.ImageBaseAddress), TYPE.POINTER, HINT.DATA_TYPE);
-                            Send(context, level + 2, NAME.TYPE.VARIABLE, "[[Virtual Address]]", GetHex(a_Context.VirtualAddress), TYPE.POINTER, HINT.DATA_TYPE);
-                            Send(context, level + 2, NAME.TYPE.VARIABLE, "[[Virtual Size]]", a_Context.VirtualSize, TYPE.INTEGER, HINT.DATA_TYPE);
-                            Send(context, level + 2, NAME.TYPE.VARIABLE, "[[Size Of Raw Data]]", a_Context.SizeOfRawData, TYPE.INTEGER, HINT.DATA_TYPE);
-                            Send(context, level + 2, NAME.TYPE.VARIABLE, "[[Pointer To Raw Data]]", GetHex(a_Context.PointerToRawData), TYPE.POINTER, HINT.DATA_TYPE);
-                            Send(context, level + 2, NAME.TYPE.VARIABLE, "[[Pointer To Relocations]]", GetHex(a_Context.PointerToRelocations), TYPE.POINTER, HINT.DATA_TYPE);
-                            Send(context, level + 2, NAME.TYPE.VARIABLE, "[[Pointer To Line Numbers]]", GetHex(a_Context.PointerToLinenumbers), TYPE.POINTER, HINT.DATA_TYPE);
-                            Send(context, level + 2, NAME.TYPE.VARIABLE, "[[Number Of Relocations]]", a_Context.NumberOfRelocations, TYPE.INTEGER, HINT.DATA_TYPE);
-                            Send(context, level + 2, NAME.TYPE.VARIABLE, "[[Number Of Line Numbers]]", a_Context.NumberOfLinenumbers, TYPE.INTEGER, HINT.DATA_TYPE);
-                            Send(context, level + 2, NAME.TYPE.VARIABLE, "[[Characteristics]]", __GetCharacteristics(a_Context.Characteristics), TYPE.FLAGS, HINT.DATA_TYPE);
+                            Send(context, NAME.TYPE.VARIABLE, level + 2, "[[Image Base Address]]", GetHex(a_Context.ImageBaseAddress), TYPE.POINTER, HINT.DATA_TYPE);
+                            Send(context, NAME.TYPE.VARIABLE, level + 2, "[[Virtual Address]]", GetHex(a_Context.VirtualAddress), TYPE.POINTER, HINT.DATA_TYPE);
+                            Send(context, NAME.TYPE.VARIABLE, level + 2, "[[Virtual Size]]", a_Context.VirtualSize, TYPE.INTEGER, HINT.DATA_TYPE);
+                            Send(context, NAME.TYPE.VARIABLE, level + 2, "[[Size Of Raw Data]]", a_Context.SizeOfRawData, TYPE.INTEGER, HINT.DATA_TYPE);
+                            Send(context, NAME.TYPE.VARIABLE, level + 2, "[[Pointer To Raw Data]]", GetHex(a_Context.PointerToRawData), TYPE.POINTER, HINT.DATA_TYPE);
+                            Send(context, NAME.TYPE.VARIABLE, level + 2, "[[Pointer To Relocations]]", GetHex(a_Context.PointerToRelocations), TYPE.POINTER, HINT.DATA_TYPE);
+                            Send(context, NAME.TYPE.VARIABLE, level + 2, "[[Pointer To Line Numbers]]", GetHex(a_Context.PointerToLinenumbers), TYPE.POINTER, HINT.DATA_TYPE);
+                            Send(context, NAME.TYPE.VARIABLE, level + 2, "[[Number Of Relocations]]", a_Context.NumberOfRelocations, TYPE.INTEGER, HINT.DATA_TYPE);
+                            Send(context, NAME.TYPE.VARIABLE, level + 2, "[[Number Of Line Numbers]]", a_Context.NumberOfLinenumbers, TYPE.INTEGER, HINT.DATA_TYPE);
+                            Send(context, NAME.TYPE.VARIABLE, level + 2, "[[Characteristics]]", __GetCharacteristics(a_Context.Characteristics), TYPE.FLAGS, HINT.DATA_TYPE);
                         }
                     }
                 }
@@ -914,7 +915,7 @@ namespace resource.preview
             {
                 if ((data.WinCertificate != null) && (data.PKCS7 != null))
                 {
-                    Send(context, level, NAME.TYPE.FOLDER, "[[Certificate]]", "");
+                    Send(context, NAME.TYPE.FOLDER, level, "[[Certificate]]", "");
                     {
                         __Execute(context, level + 1, data.WinCertificate);
                         __Execute(context, level + 1, data.PKCS7);
@@ -926,11 +927,11 @@ namespace resource.preview
             {
                 if (data != null)
                 {
-                    Send(context, level, NAME.TYPE.INFO, "Windows", "");
+                    Send(context, NAME.TYPE.INFO, level, "Windows", "");
                     {
-                        Send(context, level + 1, NAME.TYPE.VARIABLE, "[[Type]]", __GetType(data.wCertificateType), TYPE.ENUM, HINT.DATA_TYPE);
-                        Send(context, level + 1, NAME.TYPE.VARIABLE, "[[Size]]", data.dwLength, TYPE.INTEGER, HINT.DATA_TYPE);
-                        Send(context, level + 1, NAME.TYPE.VARIABLE, "[[Revision]]", data.wRevision, TYPE.INTEGER, HINT.DATA_TYPE);
+                        Send(context, NAME.TYPE.VARIABLE, level + 1, "[[Type]]", __GetType(data.wCertificateType), TYPE.ENUM, HINT.DATA_TYPE);
+                        Send(context, NAME.TYPE.VARIABLE, level + 1, "[[Size]]", data.dwLength, TYPE.INTEGER, HINT.DATA_TYPE);
+                        Send(context, NAME.TYPE.VARIABLE, level + 1, "[[Revision]]", data.wRevision, TYPE.INTEGER, HINT.DATA_TYPE);
                     }
                 }
             }
@@ -939,58 +940,58 @@ namespace resource.preview
             {
                 if (data != null)
                 {
-                    Send(context, level, NAME.TYPE.INFO, "X509", "");
+                    Send(context, NAME.TYPE.INFO, level, "X509", "");
                     {
-                        Send(context, level + 1, NAME.TYPE.VARIABLE, "[[Friendly Name]]", data.FriendlyName, TYPE.STRING, HINT.DATA_TYPE);
-                        Send(context, level + 1, NAME.TYPE.VARIABLE, "[[Subject Name]]", data.SubjectName.Name, TYPE.STRING, HINT.DATA_TYPE);
-                        Send(context, level + 1, NAME.TYPE.VARIABLE, "[[Issuer Name]]", (data.IssuerName != null) ? data.IssuerName.Name : "", TYPE.STRING, HINT.DATA_TYPE);
-                        Send(context, level + 1, NAME.TYPE.VARIABLE, "[[Serial Number]]", data.SerialNumber, TYPE.STRING, HINT.DATA_TYPE);
-                        Send(context, level + 1, NAME.TYPE.VARIABLE, "[[Thumbprint]]", data.Thumbprint, TYPE.STRING, HINT.DATA_TYPE);
-                        Send(context, level + 1, NAME.TYPE.VARIABLE, "[[Archived]]", GetBool(data.Archived), TYPE.BOOLEAN, HINT.DATA_TYPE);
-                        Send(context, level + 1, NAME.TYPE.VARIABLE, "[[Version]]", (uint)data.Version, TYPE.INTEGER, HINT.DATA_TYPE);
+                        Send(context, NAME.TYPE.VARIABLE, level + 1, "[[Friendly Name]]", data.FriendlyName, TYPE.STRING, HINT.DATA_TYPE);
+                        Send(context, NAME.TYPE.VARIABLE, level + 1, "[[Subject Name]]", data.SubjectName.Name, TYPE.STRING, HINT.DATA_TYPE);
+                        Send(context, NAME.TYPE.VARIABLE, level + 1, "[[Issuer Name]]", (data.IssuerName != null) ? data.IssuerName.Name : "", TYPE.STRING, HINT.DATA_TYPE);
+                        Send(context, NAME.TYPE.VARIABLE, level + 1, "[[Serial Number]]", data.SerialNumber, TYPE.STRING, HINT.DATA_TYPE);
+                        Send(context, NAME.TYPE.VARIABLE, level + 1, "[[Thumbprint]]", data.Thumbprint, TYPE.STRING, HINT.DATA_TYPE);
+                        Send(context, NAME.TYPE.VARIABLE, level + 1, "[[Archived]]", GetBool(data.Archived), TYPE.BOOLEAN, HINT.DATA_TYPE);
+                        Send(context, NAME.TYPE.VARIABLE, level + 1, "[[Version]]", (uint)data.Version, TYPE.INTEGER, HINT.DATA_TYPE);
                     }
                     if (data.NotBefore != null)
                     {
-                        Send(context, level + 1, NAME.TYPE.VARIABLE, "[[Not Before]]", data.NotBefore.ToString(), TYPE.DATE, HINT.DATA_TYPE);
+                        Send(context, NAME.TYPE.VARIABLE, level + 1, "[[Not Before]]", data.NotBefore.ToString(), TYPE.DATE, HINT.DATA_TYPE);
                     }
                     if (data.NotAfter != null)
                     {
-                        Send(context, level + 1, NAME.TYPE.VARIABLE, "[[Not After]]", data.NotAfter.ToString(), TYPE.DATE, HINT.DATA_TYPE);
+                        Send(context, NAME.TYPE.VARIABLE, level + 1, "[[Not After]]", data.NotAfter.ToString(), TYPE.DATE, HINT.DATA_TYPE);
                     }
                     if (data.PublicKey != null)
                     {
-                        Send(context, level + 1, NAME.TYPE.INFO, "[[Public Key]]", "", TYPE.STRUCT, HINT.DATA_TYPE);
+                        Send(context, NAME.TYPE.INFO, level + 1, "[[Public Key]]", "", TYPE.STRUCT, HINT.DATA_TYPE);
                         if (data.PublicKey.Oid != null)
                         {
-                            Send(context, level + 2, NAME.TYPE.VARIABLE, "[[Friendly Name]]", data.PublicKey.Oid.FriendlyName, TYPE.STRING, HINT.DATA_TYPE);
-                            Send(context, level + 2, NAME.TYPE.VARIABLE, "[[Value]]", data.PublicKey.Oid.Value, TYPE.STRING, HINT.DATA_TYPE);
+                            Send(context, NAME.TYPE.VARIABLE, level + 2, "[[Friendly Name]]", data.PublicKey.Oid.FriendlyName, TYPE.STRING, HINT.DATA_TYPE);
+                            Send(context, NAME.TYPE.VARIABLE, level + 2, "[[Value]]", data.PublicKey.Oid.Value, TYPE.STRING, HINT.DATA_TYPE);
                         }
                         if (data.PublicKey.Key != null)
                         {
-                            Send(context, level + 2, NAME.TYPE.VARIABLE, "[[Exchange Algorithm]]", data.PublicKey.Key.KeyExchangeAlgorithm, TYPE.STRING, HINT.DATA_TYPE);
-                            Send(context, level + 2, NAME.TYPE.VARIABLE, "[[Size]]", (uint)data.PublicKey.Key.KeySize, TYPE.INTEGER, HINT.DATA_TYPE);
+                            Send(context, NAME.TYPE.VARIABLE, level + 2, "[[Exchange Algorithm]]", data.PublicKey.Key.KeyExchangeAlgorithm, TYPE.STRING, HINT.DATA_TYPE);
+                            Send(context, NAME.TYPE.VARIABLE, level + 2, "[[Size]]", (uint)data.PublicKey.Key.KeySize, TYPE.INTEGER, HINT.DATA_TYPE);
                         }
                     }
                     if (data.PrivateKey != null)
                     {
-                        Send(context, level + 1, NAME.TYPE.INFO, "[[Private Key]]", "", TYPE.STRUCT, HINT.DATA_TYPE);
+                        Send(context, NAME.TYPE.INFO, level + 1, "[[Private Key]]", "", TYPE.STRUCT, HINT.DATA_TYPE);
                         {
-                            Send(context, level + 2, NAME.TYPE.VARIABLE, "[[Exchange Algorithm]]", data.PrivateKey.KeyExchangeAlgorithm, TYPE.STRING, HINT.DATA_TYPE);
-                            Send(context, level + 2, NAME.TYPE.VARIABLE, "[[Signature Algorithm]]", data.PrivateKey.SignatureAlgorithm, TYPE.STRING, HINT.DATA_TYPE);
-                            Send(context, level + 2, NAME.TYPE.VARIABLE, "[[Size]]", (uint)data.PrivateKey.KeySize, TYPE.INTEGER, HINT.DATA_TYPE);
+                            Send(context, NAME.TYPE.VARIABLE, level + 2, "[[Exchange Algorithm]]", data.PrivateKey.KeyExchangeAlgorithm, TYPE.STRING, HINT.DATA_TYPE);
+                            Send(context, NAME.TYPE.VARIABLE, level + 2, "[[Signature Algorithm]]", data.PrivateKey.SignatureAlgorithm, TYPE.STRING, HINT.DATA_TYPE);
+                            Send(context, NAME.TYPE.VARIABLE, level + 2, "[[Size]]", (uint)data.PrivateKey.KeySize, TYPE.INTEGER, HINT.DATA_TYPE);
                         }
                     }
                     if (data.SignatureAlgorithm != null)
                     {
-                        Send(context, level + 1, NAME.TYPE.INFO, "[[Signature Algorithm]]", "", TYPE.STRUCT, HINT.DATA_TYPE);
+                        Send(context, NAME.TYPE.INFO, level + 1, "[[Signature Algorithm]]", "", TYPE.STRUCT, HINT.DATA_TYPE);
                         {
-                            Send(context, level + 2, NAME.TYPE.VARIABLE, "[[Friendly Name]]", data.SignatureAlgorithm.FriendlyName, TYPE.STRING, HINT.DATA_TYPE);
-                            Send(context, level + 2, NAME.TYPE.VARIABLE, "[[Value]]", data.SignatureAlgorithm.Value, TYPE.STRING, HINT.DATA_TYPE);
+                            Send(context, NAME.TYPE.VARIABLE, level + 2, "[[Friendly Name]]", data.SignatureAlgorithm.FriendlyName, TYPE.STRING, HINT.DATA_TYPE);
+                            Send(context, NAME.TYPE.VARIABLE, level + 2, "[[Value]]", data.SignatureAlgorithm.Value, TYPE.STRING, HINT.DATA_TYPE);
                         }
                     }
                     if (data.Extensions != null)
                     {
-                        Send(context, level + 1, NAME.TYPE.INFO, "[[Extensions]]", "", TYPE.STRUCT, HINT.DATA_TYPE);
+                        Send(context, NAME.TYPE.INFO, level + 1, "[[Extensions]]", "", TYPE.STRUCT, HINT.DATA_TYPE);
                         foreach (var a_Context in data.Extensions)
                         {
                             if (GetState() == STATE.CANCEL)
@@ -999,11 +1000,11 @@ namespace resource.preview
                             }
                             if (a_Context.Oid != null)
                             {
-                                Send(context, level + 2, NAME.TYPE.INFO, a_Context.Oid.FriendlyName, "", TYPE.STRUCT, HINT.DATA_TYPE);
+                                Send(context, NAME.TYPE.INFO, level + 2, a_Context.Oid.FriendlyName, "", TYPE.STRUCT, HINT.DATA_TYPE);
                                 {
-                                    Send(context, level + 3, NAME.TYPE.VARIABLE, "[[Friendly Name]]", a_Context.Oid.FriendlyName, TYPE.STRING, HINT.DATA_TYPE);
-                                    Send(context, level + 3, NAME.TYPE.VARIABLE, "[[Value]]", a_Context.Oid.Value, TYPE.STRING, HINT.DATA_TYPE);
-                                    Send(context, level + 3, NAME.TYPE.VARIABLE, "[[Critical]]", GetBool(a_Context.Critical), TYPE.BOOLEAN, HINT.DATA_TYPE);
+                                    Send(context, NAME.TYPE.VARIABLE, level + 3, "[[Friendly Name]]", a_Context.Oid.FriendlyName, TYPE.STRING, HINT.DATA_TYPE);
+                                    Send(context, NAME.TYPE.VARIABLE, level + 3, "[[Value]]", a_Context.Oid.Value, TYPE.STRING, HINT.DATA_TYPE);
+                                    Send(context, NAME.TYPE.VARIABLE, level + 3, "[[Critical]]", GetBool(a_Context.Critical), TYPE.BOOLEAN, HINT.DATA_TYPE);
                                 }
                             }
                         }
@@ -1023,98 +1024,83 @@ namespace resource.preview
             }
         }
 
-        protected override void _Execute(atom.Trace context, string url)
+        protected override void _Execute(atom.Trace context, string url, int level)
         {
             var a_Context = (PeFile)null;
             if (PeFile.TryParse(url, out a_Context))
             {
                 {
                     context.
-                        SetState(NAME.STATE.REPLACE).
                         SetState(NAME.STATE.EXPAND).
+                        SetCommand(NAME.COMMAND.UPDATE).
                         SetId(CONSTANT.OUTPUT_PREVIEW_PREFIX + url).
-                        SetUrl(url).
-                        SetProgress(0, true).
-                        Send(NAME.SOURCE.PREVIEW, NAME.TYPE.INFO, 0, CONSTANT.OUTPUT_PREVIEW_PREFIX + System.IO.Path.GetFileName(url));
+                        SetUrl(url, "").
+                        SetProgress(0, true, "").
+                        Send(NAME.SOURCE.PREVIEW, NAME.TYPE.INFO, 0, CONSTANT.OUTPUT_PREVIEW_PREFIX + Path.GetFileName(url));
                 }
                 {
-                    Info.Execute(context, 1, a_Context, url);
-                    Versions.Execute(context, 1, a_Context);
-                    Headers.Execute(context, 1, a_Context);
-                    Metadata.Execute(context, 1, a_Context);
-                    ExportFunctions.Execute(context, 1, a_Context);
-                    ImportFunctions.Execute(context, 1, a_Context);
-                    ImportModules.Execute(context, 1, a_Context);
-                    Directories.Execute(context, 1, a_Context);
-                    Sections.Execute(context, 1, a_Context);
-                    Certificate.Execute(context, 1, a_Context);
+                    Info.Execute(context, level, a_Context, url);
+                    Versions.Execute(context, level, a_Context);
+                    Headers.Execute(context, level, a_Context);
+                    Metadata.Execute(context, level, a_Context);
+                    ExportFunctions.Execute(context, level, a_Context);
+                    ImportFunctions.Execute(context, level, a_Context);
+                    ImportModules.Execute(context, level, a_Context);
+                    Directories.Execute(context, level, a_Context);
+                    Sections.Execute(context, level, a_Context);
+                    Certificate.Execute(context, level, a_Context);
                 }
                 {
                     context.
-                        SetState(NAME.STATE.REPLACE).
                         SetState(NAME.STATE.EXPAND).
+                        SetCommand(NAME.COMMAND.UPDATE).
                         SetId(CONSTANT.OUTPUT_PREVIEW_PREFIX + url).
-                        SetUrl(url).
-                        Send(NAME.SOURCE.PREVIEW, NAME.TYPE.INFO, 0, CONSTANT.OUTPUT_PREVIEW_PREFIX + System.IO.Path.GetFileName(url));
+                        SetUrl(url, "").
+                        Send(NAME.SOURCE.PREVIEW, NAME.TYPE.INFO, 0, CONSTANT.OUTPUT_PREVIEW_PREFIX + Path.GetFileName(url));
                 }
             }
             else
             {
-                Send(context, 1, NAME.TYPE.ERROR, "[[This is not]] PE [[data format]]", "", "", HINT.EMPTY, NAME.STATE.NONE, "");
-            }
-            if (GetState() == STATE.CANCEL)
-            {
-                context.
-                    SendWarning(1, NAME.WARNING.TERMINATED);
+                Send(context, NAME.TYPE.ERROR, level, "[[This is not]] PE [[data format]]", "", "", HINT.EMPTY, NAME.STATE.NONE, "");
             }
         }
 
-        internal static void Send(atom.Trace context, int level, string type, string name, string value, string comment, string hint, string state, string url)
+        internal static void Send(atom.Trace context, string type, int level, string name, string value, string comment, string hint, string state, string url)
         {
             context.
-                SetContent(GetCleanString(name)).
-                SetValue(GetCleanString(value)).
-                SetComment(comment).
-                SetType(type).
+                SetComment(comment, hint).
                 SetState(state).
-                SetCommentHint(hint).
-                SetUrl(url).
-                SetLevel(level).
-                Send();
+                SetUrl(url, "").
+                Send(NAME.SOURCE.PREVIEW, type, level, GetCleanString(name), GetCleanString(value));
         }
 
-        internal static void Send(atom.Trace context, int level, string type, string name, UInt64 value, string comment, string hint, string state, string url)
+        internal static void Send(atom.Trace context, string type, int level, string name, UInt64 value, string comment, string hint, string state, string url)
         {
             context.
-                SetContent(GetCleanString(name)).
-                SetValue(value.ToString()).
-                SetComment(comment).
-                SetType(type).
+                SetComment(comment, hint).
                 SetState(state).
-                SetCommentHint(hint).
-                SetUrl(url).
-                SetLevel(level).
-                Send();
+                SetUrl(url, "").
+                Send(NAME.SOURCE.PREVIEW, type, level, GetCleanString(name), value.ToString());
         }
 
-        internal static void Send(atom.Trace context, int level, string type, string name, string value, string comment, string commentHint)
+        internal static void Send(atom.Trace context, string type, int level, string name, string value, string comment, string commentHint)
         {
-            Send(context, level, type, name, value, comment, commentHint, NAME.STATE.NONE, "");
+            Send(context, type, level, name, value, comment, commentHint, NAME.STATE.NONE, "");
         }
 
-        internal static void Send(atom.Trace context, int level, string type, string name, UInt64 value, string comment, string commentHint)
+        internal static void Send(atom.Trace context, string type, int level, string name, UInt64 value, string comment, string commentHint)
         {
-            Send(context, level, type, name, value, comment, commentHint, NAME.STATE.NONE, "");
+            Send(context, type, level, name, value, comment, commentHint, NAME.STATE.NONE, "");
         }
 
-        internal static void Send(atom.Trace context, int level, string type, string name, string value)
+        internal static void Send(atom.Trace context, string type, int level, string name, string value)
         {
-            Send(context, level, type, name, value, "", HINT.EMPTY, NAME.STATE.NONE, "");
+            Send(context, type, level, name, value, "", HINT.EMPTY, NAME.STATE.NONE, "");
         }
 
-        internal static void Send(atom.Trace context, int level, string type, string name, UInt64 value)
+        internal static void Send(atom.Trace context, string type, int level, string name, UInt64 value)
         {
-            Send(context, level, type, name, value, "", HINT.EMPTY, NAME.STATE.NONE, "");
+            Send(context, type, level, name, value, "", HINT.EMPTY, NAME.STATE.NONE, "");
         }
 
         internal static string AddFlag(string context, string value, bool isEnabled)

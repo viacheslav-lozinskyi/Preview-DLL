@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <PackageManifest Version="2.0.0" xmlns="http://schemas.microsoft.com/developer/vsx-schema/2011" xmlns:d="http://schemas.microsoft.com/developer/vsx-schema-design/2011">
     <Metadata>
-        <Identity Id="PREVIEW-DLL.EC198F83-B43E-48F7-A346-3BA545D132DE" Version="1.0.8" Language="en-US" Publisher="Viacheslav Lozinskyi" />
+        <Identity Id="PREVIEW-DLL.EC198F83-B43E-48F7-A346-3BA545D132DE" Version="1.0.10" Language="en-US" Publisher="Viacheslav Lozinskyi" />
         <DisplayName>Preview-DLL</DisplayName>
         <Description xml:space="preserve">Quick preview of DLL, EXE and SYS files</Description>
         <MoreInfo>https://marketplace.visualstudio.com/items?itemName=ViacheslavLozinskyi.Preview-DLL</MoreInfo>
@@ -44,11 +44,10 @@
     <Dependencies>
         <Dependency Id="Microsoft.Framework.NDP" DisplayName="Microsoft .NET Framework" d:Source="Manual" Version="[4.5,)" />
     </Dependencies>
-    <Prerequisites>
-        <Prerequisite Id="Microsoft.VisualStudio.Component.CoreEditor" Version="[14.0,)" DisplayName="Visual Studio core editor" />
-    </Prerequisites>
     <Assets>
-        <Asset Type="Microsoft.VisualStudio.VsPackage" d:Source="Project" d:ProjectName="%CurrentProject%" Path="|%CurrentProject%;PkgdefProjectOutputGroup|" />
         <Asset Type="Microsoft.VisualStudio.MefComponent" d:Source="Project" d:ProjectName="%CurrentProject%" Path="|%CurrentProject%|" />
     </Assets>
+    <Prerequisites>
+        <Prerequisite Id="Microsoft.VisualStudio.Component.CoreEditor" Version="[15.0,)" DisplayName="Visual Studio core editor" />
+    </Prerequisites>
 </PackageManifest>

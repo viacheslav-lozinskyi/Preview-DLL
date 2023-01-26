@@ -8,16 +8,19 @@
 
 ---
 
+## Important information:
 [![MetaOutput](https://www.metaoutput.net/_functions/watch?utm_source=github.com&utm_medium=referral&utm_campaign=view-on-github&utm_content=Preview-DLL&source=GITHUB&size=128x128&project=Preview-DLL&url=https://github.com/viacheslav-lozinskyi/Preview-DLL)](https://www.metaoutput.net/)
 
-### This extension is working only with installed [MetaOutput](https://www.metaoutput.net/) extension!
+This extension is working only with installed [MetaOutput](https://www.metaoutput.net/) extension!
 
 ---
 
-### Now you can look inside [DLL](https://en.wikipedia.org/wiki/Dynamic-link_library), [EXE](https://en.wikipedia.org/wiki/.exe) or [SYS](https://en.wikipedia.org/wiki/.sys) files not opening it.
+## Description:
+Now you can look inside [DLL](https://en.wikipedia.org/wiki/Dynamic-link_library), [EXE](https://en.wikipedia.org/wiki/.exe) or [SYS](https://en.wikipedia.org/wiki/.sys) files not opening it.
 
 ---
 
+## How it works:
 ![Image](https://viacheslav-lozinskyi.github.io/Preview-DLL/resource/video/Presentation1.gif)
 
 ---

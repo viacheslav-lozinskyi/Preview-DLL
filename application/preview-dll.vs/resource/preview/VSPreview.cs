@@ -1,7 +1,6 @@
 using PeNet;
-using PeNet.Structures;
+using PeNet.Header.Pe;
 using System;
-using System.IO;
 using System.Runtime.InteropServices;
 using System.Security.Cryptography.X509Certificates;
 using System.Text;
@@ -59,13 +58,13 @@ namespace resource.preview
                 var a_Result = "";
                 try
                 {
-                    a_Result = AddFlag(a_Result, "DLL", data.IsDLL);
-                    a_Result = AddFlag(a_Result, "EXE", data.IsEXE);
+                    a_Result = AddFlag(a_Result, "DLL", data.IsDll);
+                    a_Result = AddFlag(a_Result, "EXE", data.IsExe);
                     a_Result = AddFlag(a_Result, "[[[DRIVER]]]", data.IsDriver);
                     a_Result = AddFlag(a_Result, "32_[[[BITS]]]", data.Is32Bit);
                     a_Result = AddFlag(a_Result, "64_[[[BITS]]]", data.Is64Bit);
-                    a_Result = AddFlag(a_Result, "[[[INVALID_SIGNATURE]]]", data.IsSignatureValid == false);
-                    a_Result = AddFlag(a_Result, "[[[SIGNED]]]", data.IsSigned);
+                    a_Result = AddFlag(a_Result, "[[[INVALID_SIGNATURE]]]", data.HasValidAuthenticodeSignature == false);
+                    a_Result = AddFlag(a_Result, "[[[SIGNED]]]", data.IsAuthenticodeSigned);
                     //a_Result = AddFlag(a_Result, "[[[DEBUG]]]", data.ImageDebugDirectory != null);
                     //a_Result = AddFlag(a_Result, "[[[RELEASE]]]", data.ImageDebugDirectory == null);
                 }
@@ -116,21 +115,21 @@ namespace resource.preview
                                 }
                                 else
                                 {
-                                    if (a_Context1.szKey == "ProductName") continue;
-                                    if (a_Context1.szKey == "PrivateBuild") continue;
-                                    if (a_Context1.szKey == "OriginalFilename") continue;
-                                    if (a_Context1.szKey == "LegalTrademarks") continue;
-                                    if (a_Context1.szKey == "LegalCopyright") continue;
-                                    if (a_Context1.szKey == "InternalName") continue;
-                                    if (a_Context1.szKey == "FileVersion") continue;
-                                    if (a_Context1.szKey == "FileDescription") continue;
-                                    if (a_Context1.szKey == "CompanyName") continue;
-                                    if (a_Context1.szKey == "Comments") continue;
-                                    if (a_Context1.szKey == "ProductVersion") continue;
-                                    if (a_Context1.szKey == "SpecialBuild") continue;
+                                    if (a_Context1.SzKey == "ProductName") continue;
+                                    if (a_Context1.SzKey == "PrivateBuild") continue;
+                                    if (a_Context1.SzKey == "OriginalFilename") continue;
+                                    if (a_Context1.SzKey == "LegalTrademarks") continue;
+                                    if (a_Context1.SzKey == "LegalCopyright") continue;
+                                    if (a_Context1.SzKey == "InternalName") continue;
+                                    if (a_Context1.SzKey == "FileVersion") continue;
+                                    if (a_Context1.SzKey == "FileDescription") continue;
+                                    if (a_Context1.SzKey == "CompanyName") continue;
+                                    if (a_Context1.SzKey == "Comments") continue;
+                                    if (a_Context1.SzKey == "ProductVersion") continue;
+                                    if (a_Context1.SzKey == "SpecialBuild") continue;
                                 }
                                 {
-                                    Send(context, NAME.EVENT.PARAMETER, level + 2, a_Context1.szKey, a_Context1.Value, TYPE.STRING, HINT.DATA_TYPE);
+                                    Send(context, NAME.EVENT.PARAMETER, level + 2, a_Context1.SzKey, a_Context1.Value, TYPE.STRING, HINT.DATA_TYPE);
                                 }
                             }
                         }
@@ -159,12 +158,12 @@ namespace resource.preview
                         Send(context, NAME.EVENT.PARAMETER, level + 1, "[[[File Header]]]", "", TYPE.STRUCT, HINT.DATA_TYPE);
                         if ((data.ImageNtHeaders != null) && (data.ImageNtHeaders.FileHeader != null))
                         {
-                            Send(context, NAME.EVENT.PARAMETER, level + 2, "[[[Machine]]]", __GetMachine(data.ImageNtHeaders.FileHeader.Machine), TYPE.ENUM, HINT.DATA_TYPE);
+                            Send(context, NAME.EVENT.PARAMETER, level + 2, "[[[Machine]]]", data.ImageNtHeaders.FileHeader.Machine.ToString(), TYPE.ENUM, HINT.DATA_TYPE);
                             Send(context, NAME.EVENT.PARAMETER, level + 2, "[[[TimeStamp]]]", GetHex(data.ImageNtHeaders.FileHeader.TimeDateStamp), TYPE.INTEGER, HINT.DATA_TYPE);
                             Send(context, NAME.EVENT.PARAMETER, level + 2, "[[[Pointer To Symbol Table]]]", data.ImageNtHeaders.FileHeader.PointerToSymbolTable, TYPE.INTEGER, HINT.DATA_TYPE);
                             Send(context, NAME.EVENT.PARAMETER, level + 2, "[[[Number Of Symbols]]]", data.ImageNtHeaders.FileHeader.NumberOfSymbols, TYPE.INTEGER, HINT.DATA_TYPE);
                             Send(context, NAME.EVENT.PARAMETER, level + 2, "[[[Number Of Sections]]]", data.ImageNtHeaders.FileHeader.NumberOfSections, TYPE.INTEGER, HINT.DATA_TYPE);
-                            Send(context, NAME.EVENT.PARAMETER, level + 2, "[[[Characteristics]]]", __GetCharacteristics(data.ImageNtHeaders.FileHeader.Characteristics), TYPE.FLAGS, HINT.DATA_TYPE);
+                            Send(context, NAME.EVENT.PARAMETER, level + 2, "[[[Characteristics]]]", data.ImageNtHeaders.FileHeader.Characteristics.ToString(), TYPE.FLAGS, HINT.DATA_TYPE);
                         }
                     }
                     {
@@ -187,9 +186,9 @@ namespace resource.preview
                             Send(context, NAME.EVENT.PARAMETER, level + 2, "[[[Size Of Code]]]", data.ImageNtHeaders.OptionalHeader.SizeOfCode, TYPE.INTEGER, HINT.DATA_TYPE);
                             Send(context, NAME.EVENT.PARAMETER, level + 2, "[[[File Alignment]]]", data.ImageNtHeaders.OptionalHeader.FileAlignment, TYPE.INTEGER, HINT.DATA_TYPE);
                             Send(context, NAME.EVENT.PARAMETER, level + 2, "[[[Section Alignment]]]", data.ImageNtHeaders.OptionalHeader.SectionAlignment, TYPE.INTEGER, HINT.DATA_TYPE);
-                            Send(context, NAME.EVENT.PARAMETER, level + 2, "[[[Characteristics]]]", __GetDllCharacteristics(data.ImageNtHeaders.OptionalHeader.DllCharacteristics), TYPE.FLAGS, HINT.DATA_TYPE);
-                            Send(context, NAME.EVENT.PARAMETER, level + 2, "[[[Subsystem]]]", __GetSubsystem(data.ImageNtHeaders.OptionalHeader.Subsystem), TYPE.ENUM, HINT.DATA_TYPE);
-                            Send(context, NAME.EVENT.PARAMETER, level + 2, "[[[Magic]]]", __GetMagic(data.ImageNtHeaders.OptionalHeader.Magic), TYPE.FLAGS, HINT.DATA_TYPE);
+                            Send(context, NAME.EVENT.PARAMETER, level + 2, "[[[Characteristics]]]", data.ImageNtHeaders.OptionalHeader.DllCharacteristics.ToString(), TYPE.FLAGS, HINT.DATA_TYPE);
+                            Send(context, NAME.EVENT.PARAMETER, level + 2, "[[[Subsystem]]]", data.ImageNtHeaders.OptionalHeader.Subsystem.ToString(), TYPE.ENUM, HINT.DATA_TYPE);
+                            Send(context, NAME.EVENT.PARAMETER, level + 2, "[[[Magic]]]", data.ImageNtHeaders.OptionalHeader.Magic.ToString(), TYPE.FLAGS, HINT.DATA_TYPE);
                             Send(context, NAME.EVENT.PARAMETER, level + 2, "[[[Loader Flags]]]", GetHex(data.ImageNtHeaders.OptionalHeader.LoaderFlags), TYPE.FLAGS, HINT.DATA_TYPE);
                             Send(context, NAME.EVENT.PARAMETER, level + 2, "[[[Number Of]]] RVA [[[And Sizes]]]", data.ImageNtHeaders.OptionalHeader.NumberOfRvaAndSizes, TYPE.INTEGER, HINT.DATA_TYPE);
                             Send(context, NAME.EVENT.PARAMETER, level + 2, "[[[Image Version]]]", GetVersion(data.ImageNtHeaders.OptionalHeader.MajorImageVersion, data.ImageNtHeaders.OptionalHeader.MinorImageVersion), TYPE.VERSION, HINT.DATA_TYPE);
@@ -203,23 +202,23 @@ namespace resource.preview
                         Send(context, NAME.EVENT.PARAMETER, level + 1, "DOS [[[Header]]]", "", TYPE.STRUCT, HINT.DATA_TYPE);
                         if (data.ImageDosHeader != null)
                         {
-                            Send(context, NAME.EVENT.PARAMETER, level + 2, "oeminfo", data.ImageDosHeader.e_oeminfo, TYPE.INTEGER, HINT.DATA_TYPE);
-                            Send(context, NAME.EVENT.PARAMETER, level + 2, "oemid", data.ImageDosHeader.e_oemid, TYPE.INTEGER, HINT.DATA_TYPE);
-                            Send(context, NAME.EVENT.PARAMETER, level + 2, "ovno", data.ImageDosHeader.e_ovno, TYPE.INTEGER, HINT.DATA_TYPE);
-                            Send(context, NAME.EVENT.PARAMETER, level + 2, "lfarlc", data.ImageDosHeader.e_lfarlc, TYPE.INTEGER, HINT.DATA_TYPE);
-                            Send(context, NAME.EVENT.PARAMETER, level + 2, "cs", data.ImageDosHeader.e_cs, TYPE.INTEGER, HINT.DATA_TYPE);
-                            Send(context, NAME.EVENT.PARAMETER, level + 2, "ip", data.ImageDosHeader.e_ip, TYPE.INTEGER, HINT.DATA_TYPE);
-                            Send(context, NAME.EVENT.PARAMETER, level + 2, "csum", data.ImageDosHeader.e_csum, TYPE.INTEGER, HINT.DATA_TYPE);
-                            Send(context, NAME.EVENT.PARAMETER, level + 2, "sp", data.ImageDosHeader.e_sp, TYPE.INTEGER, HINT.DATA_TYPE);
-                            Send(context, NAME.EVENT.PARAMETER, level + 2, "ss", data.ImageDosHeader.e_ss, TYPE.INTEGER, HINT.DATA_TYPE);
-                            Send(context, NAME.EVENT.PARAMETER, level + 2, "maxalloc", data.ImageDosHeader.e_maxalloc, TYPE.INTEGER, HINT.DATA_TYPE);
-                            Send(context, NAME.EVENT.PARAMETER, level + 2, "minalloc", data.ImageDosHeader.e_minalloc, TYPE.INTEGER, HINT.DATA_TYPE);
-                            Send(context, NAME.EVENT.PARAMETER, level + 2, "cparhdr", data.ImageDosHeader.e_cparhdr, TYPE.INTEGER, HINT.DATA_TYPE);
-                            Send(context, NAME.EVENT.PARAMETER, level + 2, "crlc", data.ImageDosHeader.e_crlc, TYPE.INTEGER, HINT.DATA_TYPE);
-                            Send(context, NAME.EVENT.PARAMETER, level + 2, "cp", data.ImageDosHeader.e_cp, TYPE.INTEGER, HINT.DATA_TYPE);
-                            Send(context, NAME.EVENT.PARAMETER, level + 2, "cblp", data.ImageDosHeader.e_cblp, TYPE.INTEGER, HINT.DATA_TYPE);
-                            Send(context, NAME.EVENT.PARAMETER, level + 2, "magic", __GetMagic(data.ImageDosHeader.e_magic), TYPE.FLAGS, HINT.DATA_TYPE);
-                            Send(context, NAME.EVENT.PARAMETER, level + 2, "lfanew", data.ImageDosHeader.e_lfanew, TYPE.INTEGER, HINT.DATA_TYPE);
+                            Send(context, NAME.EVENT.PARAMETER, level + 2, "oeminfo", data.ImageDosHeader.E_oeminfo, TYPE.INTEGER, HINT.DATA_TYPE);
+                            Send(context, NAME.EVENT.PARAMETER, level + 2, "oemid", data.ImageDosHeader.E_oemid, TYPE.INTEGER, HINT.DATA_TYPE);
+                            Send(context, NAME.EVENT.PARAMETER, level + 2, "ovno", data.ImageDosHeader.E_ovno, TYPE.INTEGER, HINT.DATA_TYPE);
+                            Send(context, NAME.EVENT.PARAMETER, level + 2, "lfarlc", data.ImageDosHeader.E_lfarlc, TYPE.INTEGER, HINT.DATA_TYPE);
+                            Send(context, NAME.EVENT.PARAMETER, level + 2, "cs", data.ImageDosHeader.E_cs, TYPE.INTEGER, HINT.DATA_TYPE);
+                            Send(context, NAME.EVENT.PARAMETER, level + 2, "ip", data.ImageDosHeader.E_ip, TYPE.INTEGER, HINT.DATA_TYPE);
+                            Send(context, NAME.EVENT.PARAMETER, level + 2, "csum", data.ImageDosHeader.E_csum, TYPE.INTEGER, HINT.DATA_TYPE);
+                            Send(context, NAME.EVENT.PARAMETER, level + 2, "sp", data.ImageDosHeader.E_sp, TYPE.INTEGER, HINT.DATA_TYPE);
+                            Send(context, NAME.EVENT.PARAMETER, level + 2, "ss", data.ImageDosHeader.E_ss, TYPE.INTEGER, HINT.DATA_TYPE);
+                            Send(context, NAME.EVENT.PARAMETER, level + 2, "maxalloc", data.ImageDosHeader.E_maxalloc, TYPE.INTEGER, HINT.DATA_TYPE);
+                            Send(context, NAME.EVENT.PARAMETER, level + 2, "minalloc", data.ImageDosHeader.E_minalloc, TYPE.INTEGER, HINT.DATA_TYPE);
+                            Send(context, NAME.EVENT.PARAMETER, level + 2, "cparhdr", data.ImageDosHeader.E_cparhdr, TYPE.INTEGER, HINT.DATA_TYPE);
+                            Send(context, NAME.EVENT.PARAMETER, level + 2, "crlc", data.ImageDosHeader.E_crlc, TYPE.INTEGER, HINT.DATA_TYPE);
+                            Send(context, NAME.EVENT.PARAMETER, level + 2, "cp", data.ImageDosHeader.E_cp, TYPE.INTEGER, HINT.DATA_TYPE);
+                            Send(context, NAME.EVENT.PARAMETER, level + 2, "cblp", data.ImageDosHeader.E_cblp, TYPE.INTEGER, HINT.DATA_TYPE);
+                            Send(context, NAME.EVENT.PARAMETER, level + 2, "magic", __GetMagic(data.ImageDosHeader.E_magic), TYPE.FLAGS, HINT.DATA_TYPE);
+                            Send(context, NAME.EVENT.PARAMETER, level + 2, "lfanew", data.ImageDosHeader.E_lfanew, TYPE.INTEGER, HINT.DATA_TYPE);
                         }
                     }
                 }
@@ -229,65 +228,65 @@ namespace resource.preview
                 }
             }
 
-            static private string __GetMachine(ushort value)
-            {
-                switch ((IMAGE_FILE_HEADER_MACHINE)value)
-                {
-                    case IMAGE_FILE_HEADER_MACHINE.IMAGE_FILE_MACHINE_UNKNOWN: return "UNKNOWN";
-                    case IMAGE_FILE_HEADER_MACHINE.IMAGE_FILE_MACHINE_I386: return "I386";
-                    case IMAGE_FILE_HEADER_MACHINE.IMAGE_FILE_MACHINE_R3000: return "R3000";
-                    case IMAGE_FILE_HEADER_MACHINE.IMAGE_FILE_MACHINE_R4000: return "R4000";
-                    case IMAGE_FILE_HEADER_MACHINE.IMAGE_FILE_MACHINE_R10000: return "R10000";
-                    case IMAGE_FILE_HEADER_MACHINE.IMAGE_FILE_MACHINE_WCEMIPSV2: return "WCEMIPSV2";
-                    case IMAGE_FILE_HEADER_MACHINE.IMAGE_FILE_MACHINE_ALPHA: return "ALPHA";
-                    case IMAGE_FILE_HEADER_MACHINE.IMAGE_FILE_MACHINE_SH3: return "SH3";
-                    case IMAGE_FILE_HEADER_MACHINE.IMAGE_FILE_MACHINE_SH3DSP: return "SH3DSP";
-                    case IMAGE_FILE_HEADER_MACHINE.IMAGE_FILE_MACHINE_SH3E: return "SH3E";
-                    case IMAGE_FILE_HEADER_MACHINE.IMAGE_FILE_MACHINE_SH4: return "SH4";
-                    case IMAGE_FILE_HEADER_MACHINE.IMAGE_FILE_MACHINE_SH5: return "SH5";
-                    case IMAGE_FILE_HEADER_MACHINE.IMAGE_FILE_MACHINE_ARM: return "ARM";
-                    case IMAGE_FILE_HEADER_MACHINE.IMAGE_FILE_MACHINE_THUMB: return "THUMB";
-                    case IMAGE_FILE_HEADER_MACHINE.IMAGE_FILE_MACHINE_ARMNT: return "ARMNT";
-                    case IMAGE_FILE_HEADER_MACHINE.IMAGE_FILE_MACHINE_AM33: return "AM33";
-                    case IMAGE_FILE_HEADER_MACHINE.IMAGE_FILE_MACHINE_POWERPC: return "POWERPC";
-                    case IMAGE_FILE_HEADER_MACHINE.IMAGE_FILE_MACHINE_POWERPCFP: return "POWERPCFP";
-                    case IMAGE_FILE_HEADER_MACHINE.IMAGE_FILE_MACHINE_IA64: return "IA64";
-                    case IMAGE_FILE_HEADER_MACHINE.IMAGE_FILE_MACHINE_MIPS16: return "MIPS16";
-                    case IMAGE_FILE_HEADER_MACHINE.IMAGE_FILE_MACHINE_ALPHA64: return "ALPHA64";
-                    case IMAGE_FILE_HEADER_MACHINE.IMAGE_FILE_MACHINE_MIPSFPU: return "MIPSFPU";
-                    case IMAGE_FILE_HEADER_MACHINE.IMAGE_FILE_MACHINE_MIPSFPU16: return "MIPSFPU16";
-                    case IMAGE_FILE_HEADER_MACHINE.IMAGE_FILE_MACHINE_TRICORE: return "TRICORE";
-                    case IMAGE_FILE_HEADER_MACHINE.IMAGE_FILE_MACHINE_CEF: return "CEF";
-                    case IMAGE_FILE_HEADER_MACHINE.IMAGE_FILE_MACHINE_EBC: return "EBC";
-                    case IMAGE_FILE_HEADER_MACHINE.IMAGE_FILE_MACHINE_AMD64: return "AMD64";
-                    case IMAGE_FILE_HEADER_MACHINE.IMAGE_FILE_MACHINE_M32R: return "M32R";
-                    case IMAGE_FILE_HEADER_MACHINE.IMAGE_FILE_MACHINE_CEE: return "CEE";
-                }
-                return value.ToString();
-            }
+            //static private string __GetMachine(ushort value)
+            //{
+            //    switch ((IMAGE_FILE_HEADER_MACHINE)value)
+            //    {
+            //        case IMAGE_FILE_HEADER_MACHINE.IMAGE_FILE_MACHINE_UNKNOWN: return "UNKNOWN";
+            //        case IMAGE_FILE_HEADER_MACHINE.IMAGE_FILE_MACHINE_I386: return "I386";
+            //        case IMAGE_FILE_HEADER_MACHINE.IMAGE_FILE_MACHINE_R3000: return "R3000";
+            //        case IMAGE_FILE_HEADER_MACHINE.IMAGE_FILE_MACHINE_R4000: return "R4000";
+            //        case IMAGE_FILE_HEADER_MACHINE.IMAGE_FILE_MACHINE_R10000: return "R10000";
+            //        case IMAGE_FILE_HEADER_MACHINE.IMAGE_FILE_MACHINE_WCEMIPSV2: return "WCEMIPSV2";
+            //        case IMAGE_FILE_HEADER_MACHINE.IMAGE_FILE_MACHINE_ALPHA: return "ALPHA";
+            //        case IMAGE_FILE_HEADER_MACHINE.IMAGE_FILE_MACHINE_SH3: return "SH3";
+            //        case IMAGE_FILE_HEADER_MACHINE.IMAGE_FILE_MACHINE_SH3DSP: return "SH3DSP";
+            //        case IMAGE_FILE_HEADER_MACHINE.IMAGE_FILE_MACHINE_SH3E: return "SH3E";
+            //        case IMAGE_FILE_HEADER_MACHINE.IMAGE_FILE_MACHINE_SH4: return "SH4";
+            //        case IMAGE_FILE_HEADER_MACHINE.IMAGE_FILE_MACHINE_SH5: return "SH5";
+            //        case IMAGE_FILE_HEADER_MACHINE.IMAGE_FILE_MACHINE_ARM: return "ARM";
+            //        case IMAGE_FILE_HEADER_MACHINE.IMAGE_FILE_MACHINE_THUMB: return "THUMB";
+            //        case IMAGE_FILE_HEADER_MACHINE.IMAGE_FILE_MACHINE_ARMNT: return "ARMNT";
+            //        case IMAGE_FILE_HEADER_MACHINE.IMAGE_FILE_MACHINE_AM33: return "AM33";
+            //        case IMAGE_FILE_HEADER_MACHINE.IMAGE_FILE_MACHINE_POWERPC: return "POWERPC";
+            //        case IMAGE_FILE_HEADER_MACHINE.IMAGE_FILE_MACHINE_POWERPCFP: return "POWERPCFP";
+            //        case IMAGE_FILE_HEADER_MACHINE.IMAGE_FILE_MACHINE_IA64: return "IA64";
+            //        case IMAGE_FILE_HEADER_MACHINE.IMAGE_FILE_MACHINE_MIPS16: return "MIPS16";
+            //        case IMAGE_FILE_HEADER_MACHINE.IMAGE_FILE_MACHINE_ALPHA64: return "ALPHA64";
+            //        case IMAGE_FILE_HEADER_MACHINE.IMAGE_FILE_MACHINE_MIPSFPU: return "MIPSFPU";
+            //        case IMAGE_FILE_HEADER_MACHINE.IMAGE_FILE_MACHINE_MIPSFPU16: return "MIPSFPU16";
+            //        case IMAGE_FILE_HEADER_MACHINE.IMAGE_FILE_MACHINE_TRICORE: return "TRICORE";
+            //        case IMAGE_FILE_HEADER_MACHINE.IMAGE_FILE_MACHINE_CEF: return "CEF";
+            //        case IMAGE_FILE_HEADER_MACHINE.IMAGE_FILE_MACHINE_EBC: return "EBC";
+            //        case IMAGE_FILE_HEADER_MACHINE.IMAGE_FILE_MACHINE_AMD64: return "AMD64";
+            //        case IMAGE_FILE_HEADER_MACHINE.IMAGE_FILE_MACHINE_M32R: return "M32R";
+            //        case IMAGE_FILE_HEADER_MACHINE.IMAGE_FILE_MACHINE_CEE: return "CEE";
+            //    }
+            //    return value.ToString();
+            //}
 
-            static private string __GetCharacteristics(int value)
-            {
-                var a_Result = "";
-                {
-                    a_Result = AddFlag(a_Result, "RELOCS_STRIPPED", (value & (int)IMAGE_FILE_HEADER_CHARACTERISTICS.IMAGE_FILE_RELOCS_STRIPPED) != 0);
-                    a_Result = AddFlag(a_Result, "EXECUTABLE_IMAGE", (value & (int)IMAGE_FILE_HEADER_CHARACTERISTICS.IMAGE_FILE_EXECUTABLE_IMAGE) != 0);
-                    a_Result = AddFlag(a_Result, "LINE_NUMS_STRIPPED", (value & (int)IMAGE_FILE_HEADER_CHARACTERISTICS.IMAGE_FILE_LINE_NUMS_STRIPPED) != 0);
-                    a_Result = AddFlag(a_Result, "LOCAL_SYMS_STRIPPED", (value & (int)IMAGE_FILE_HEADER_CHARACTERISTICS.IMAGE_FILE_LOCAL_SYMS_STRIPPED) != 0);
-                    a_Result = AddFlag(a_Result, "AGGRESIVE_WS_TRIM", (value & (int)IMAGE_FILE_HEADER_CHARACTERISTICS.IMAGE_FILE_AGGRESIVE_WS_TRIM) != 0);
-                    a_Result = AddFlag(a_Result, "LARGE_ADDRESS_AWARE", (value & (int)IMAGE_FILE_HEADER_CHARACTERISTICS.IMAGE_FILE_LARGE_ADDRESS_AWARE) != 0);
-                    a_Result = AddFlag(a_Result, "BYTES_REVERSED_LO", (value & (int)IMAGE_FILE_HEADER_CHARACTERISTICS.IMAGE_FILE_BYTES_REVERSED_LO) != 0);
-                    a_Result = AddFlag(a_Result, "32BIT_MACHINE", (value & (int)IMAGE_FILE_HEADER_CHARACTERISTICS.IMAGE_FILE_32BIT_MACHINE) != 0);
-                    a_Result = AddFlag(a_Result, "DEBUG_STRIPPED", (value & (int)IMAGE_FILE_HEADER_CHARACTERISTICS.IMAGE_FILE_DEBUG_STRIPPED) != 0);
-                    a_Result = AddFlag(a_Result, "REMOVABLE_RUN_FROM_SWAP", (value & (int)IMAGE_FILE_HEADER_CHARACTERISTICS.IMAGE_FILE_REMOVABLE_RUN_FROM_SWAP) != 0);
-                    a_Result = AddFlag(a_Result, "NET_RUN_FROM_SWAP", (value & (int)IMAGE_FILE_HEADER_CHARACTERISTICS.IMAGE_FILE_NET_RUN_FROM_SWAP) != 0);
-                    a_Result = AddFlag(a_Result, "SYSTEM", (value & (int)IMAGE_FILE_HEADER_CHARACTERISTICS.IMAGE_FILE_SYSTEM) != 0);
-                    a_Result = AddFlag(a_Result, "DLL", (value & (int)IMAGE_FILE_HEADER_CHARACTERISTICS.IMAGE_FILE_DLL) != 0);
-                    a_Result = AddFlag(a_Result, "UP_SYSTEM_ONLY", (value & (int)IMAGE_FILE_HEADER_CHARACTERISTICS.IMAGE_FILE_UP_SYSTEM_ONLY) != 0);
-                    a_Result = AddFlag(a_Result, "BYTES_REVERSED_HI", (value & (int)IMAGE_FILE_HEADER_CHARACTERISTICS.IMAGE_FILE_BYTES_REVERSED_HI) != 0);
-                }
-                return a_Result;
-            }
+            //static private string __GetCharacteristics(int value)
+            //{
+            //    var a_Result = "";
+            //    {
+            //        a_Result = AddFlag(a_Result, "RELOCS_STRIPPED", (value & (int)IMAGE_FILE_HEADER_CHARACTERISTICS.IMAGE_FILE_RELOCS_STRIPPED) != 0);
+            //        a_Result = AddFlag(a_Result, "EXECUTABLE_IMAGE", (value & (int)IMAGE_FILE_HEADER_CHARACTERISTICS.IMAGE_FILE_EXECUTABLE_IMAGE) != 0);
+            //        a_Result = AddFlag(a_Result, "LINE_NUMS_STRIPPED", (value & (int)IMAGE_FILE_HEADER_CHARACTERISTICS.IMAGE_FILE_LINE_NUMS_STRIPPED) != 0);
+            //        a_Result = AddFlag(a_Result, "LOCAL_SYMS_STRIPPED", (value & (int)IMAGE_FILE_HEADER_CHARACTERISTICS.IMAGE_FILE_LOCAL_SYMS_STRIPPED) != 0);
+            //        a_Result = AddFlag(a_Result, "AGGRESIVE_WS_TRIM", (value & (int)IMAGE_FILE_HEADER_CHARACTERISTICS.IMAGE_FILE_AGGRESIVE_WS_TRIM) != 0);
+            //        a_Result = AddFlag(a_Result, "LARGE_ADDRESS_AWARE", (value & (int)IMAGE_FILE_HEADER_CHARACTERISTICS.IMAGE_FILE_LARGE_ADDRESS_AWARE) != 0);
+            //        a_Result = AddFlag(a_Result, "BYTES_REVERSED_LO", (value & (int)IMAGE_FILE_HEADER_CHARACTERISTICS.IMAGE_FILE_BYTES_REVERSED_LO) != 0);
+            //        a_Result = AddFlag(a_Result, "32BIT_MACHINE", (value & (int)IMAGE_FILE_HEADER_CHARACTERISTICS.IMAGE_FILE_32BIT_MACHINE) != 0);
+            //        a_Result = AddFlag(a_Result, "DEBUG_STRIPPED", (value & (int)IMAGE_FILE_HEADER_CHARACTERISTICS.IMAGE_FILE_DEBUG_STRIPPED) != 0);
+            //        a_Result = AddFlag(a_Result, "REMOVABLE_RUN_FROM_SWAP", (value & (int)IMAGE_FILE_HEADER_CHARACTERISTICS.IMAGE_FILE_REMOVABLE_RUN_FROM_SWAP) != 0);
+            //        a_Result = AddFlag(a_Result, "NET_RUN_FROM_SWAP", (value & (int)IMAGE_FILE_HEADER_CHARACTERISTICS.IMAGE_FILE_NET_RUN_FROM_SWAP) != 0);
+            //        a_Result = AddFlag(a_Result, "SYSTEM", (value & (int)IMAGE_FILE_HEADER_CHARACTERISTICS.IMAGE_FILE_SYSTEM) != 0);
+            //        a_Result = AddFlag(a_Result, "DLL", (value & (int)IMAGE_FILE_HEADER_CHARACTERISTICS.IMAGE_FILE_DLL) != 0);
+            //        a_Result = AddFlag(a_Result, "UP_SYSTEM_ONLY", (value & (int)IMAGE_FILE_HEADER_CHARACTERISTICS.IMAGE_FILE_UP_SYSTEM_ONLY) != 0);
+            //        a_Result = AddFlag(a_Result, "BYTES_REVERSED_HI", (value & (int)IMAGE_FILE_HEADER_CHARACTERISTICS.IMAGE_FILE_BYTES_REVERSED_HI) != 0);
+            //    }
+            //    return a_Result;
+            //}
 
             static private string __GetMagic(int value)
             {
@@ -300,42 +299,42 @@ namespace resource.preview
                 return a_Result;
             }
 
-            static private string __GetSubsystem(int value)
-            {
-                switch ((IMAGE_OPTIONAL_HEADER_SUBSYSTEM)value)
-                {
-                    case IMAGE_OPTIONAL_HEADER_SUBSYSTEM.IMAGE_SUBSYSTEM_UNKNOWN: return "UNKNOWN";
-                    case IMAGE_OPTIONAL_HEADER_SUBSYSTEM.IMAGE_SUBSYSTEM_NATIVE: return "NATIVE";
-                    case IMAGE_OPTIONAL_HEADER_SUBSYSTEM.IMAGE_SUBSYSTEM_WINDOWS_GUI: return "WINDOWS_GUI";
-                    case IMAGE_OPTIONAL_HEADER_SUBSYSTEM.IMAGE_SUBSYSTEM_WINDOWS_CUI: return "WINDOWS_CUI";
-                    case IMAGE_OPTIONAL_HEADER_SUBSYSTEM.IMAGE_SUBSYSTEM_OS2_CUI: return "OS2_CUI";
-                    case IMAGE_OPTIONAL_HEADER_SUBSYSTEM.IMAGE_SUBSYSTEM_POSIX_CUI: return "POSIX_CUI";
-                    case IMAGE_OPTIONAL_HEADER_SUBSYSTEM.IMAGE_SUBSYSTEM_WINDOWS_CE_GUI: return "WINDOWS_CE_GUI";
-                    case IMAGE_OPTIONAL_HEADER_SUBSYSTEM.IMAGE_SUBSYSTEM_EFI_APPLICATION: return "EFI_APPLICATION";
-                    case IMAGE_OPTIONAL_HEADER_SUBSYSTEM.IMAGE_SUBSYSTEM_EFI_BOOT_SERVICE_DRIVER: return "EFI_BOOT_SERVICE_DRIVER";
-                    case IMAGE_OPTIONAL_HEADER_SUBSYSTEM.IMAGE_SUBSYSTEM_EFI_RUNTIME_DRIVER: return "EFI_RUNTIME_DRIVER";
-                    case IMAGE_OPTIONAL_HEADER_SUBSYSTEM.IMAGE_SUBSYSTEM_EFI_ROM: return "EFI_ROM";
-                    case IMAGE_OPTIONAL_HEADER_SUBSYSTEM.IMAGE_SUBSYSTEM_XBOX: return "XBOX";
-                    case IMAGE_OPTIONAL_HEADER_SUBSYSTEM.IMAGE_SUBSYSTEM_WINDOWS_BOOT_APPLICATION: return "WINDOWS_BOOT_APPLICATION";
-                }
-                return value.ToString();
-            }
+            //static private string __GetSubsystem(int value)
+            //{
+            //    switch ((IMAGE_OPTIONAL_HEADER_SUBSYSTEM)value)
+            //    {
+            //        case IMAGE_OPTIONAL_HEADER_SUBSYSTEM.IMAGE_SUBSYSTEM_UNKNOWN: return "UNKNOWN";
+            //        case IMAGE_OPTIONAL_HEADER_SUBSYSTEM.IMAGE_SUBSYSTEM_NATIVE: return "NATIVE";
+            //        case IMAGE_OPTIONAL_HEADER_SUBSYSTEM.IMAGE_SUBSYSTEM_WINDOWS_GUI: return "WINDOWS_GUI";
+            //        case IMAGE_OPTIONAL_HEADER_SUBSYSTEM.IMAGE_SUBSYSTEM_WINDOWS_CUI: return "WINDOWS_CUI";
+            //        case IMAGE_OPTIONAL_HEADER_SUBSYSTEM.IMAGE_SUBSYSTEM_OS2_CUI: return "OS2_CUI";
+            //        case IMAGE_OPTIONAL_HEADER_SUBSYSTEM.IMAGE_SUBSYSTEM_POSIX_CUI: return "POSIX_CUI";
+            //        case IMAGE_OPTIONAL_HEADER_SUBSYSTEM.IMAGE_SUBSYSTEM_WINDOWS_CE_GUI: return "WINDOWS_CE_GUI";
+            //        case IMAGE_OPTIONAL_HEADER_SUBSYSTEM.IMAGE_SUBSYSTEM_EFI_APPLICATION: return "EFI_APPLICATION";
+            //        case IMAGE_OPTIONAL_HEADER_SUBSYSTEM.IMAGE_SUBSYSTEM_EFI_BOOT_SERVICE_DRIVER: return "EFI_BOOT_SERVICE_DRIVER";
+            //        case IMAGE_OPTIONAL_HEADER_SUBSYSTEM.IMAGE_SUBSYSTEM_EFI_RUNTIME_DRIVER: return "EFI_RUNTIME_DRIVER";
+            //        case IMAGE_OPTIONAL_HEADER_SUBSYSTEM.IMAGE_SUBSYSTEM_EFI_ROM: return "EFI_ROM";
+            //        case IMAGE_OPTIONAL_HEADER_SUBSYSTEM.IMAGE_SUBSYSTEM_XBOX: return "XBOX";
+            //        case IMAGE_OPTIONAL_HEADER_SUBSYSTEM.IMAGE_SUBSYSTEM_WINDOWS_BOOT_APPLICATION: return "WINDOWS_BOOT_APPLICATION";
+            //    }
+            //    return value.ToString();
+            //}
 
-            static private string __GetDllCharacteristics(int value)
-            {
-                var a_Result = "";
-                {
-                    a_Result = AddFlag(a_Result, "DYNAMIC_BASE", (value & (int)IMAGE_OPTIONAL_HEADER_DLLCHARACTERISTICS.IMAGE_DLLCHARACTERISTICS_DYNAMIC_BASE) != 0);
-                    a_Result = AddFlag(a_Result, "FORCE_INTEGRITY", (value & (int)IMAGE_OPTIONAL_HEADER_DLLCHARACTERISTICS.IMAGE_DLLCHARACTERISTICS_FORCE_INTEGRITY) != 0);
-                    a_Result = AddFlag(a_Result, "NX_COMPAT", (value & (int)IMAGE_OPTIONAL_HEADER_DLLCHARACTERISTICS.IMAGE_DLLCHARACTERISTICS_NX_COMPAT) != 0);
-                    a_Result = AddFlag(a_Result, "NO_ISOLATION", (value & (int)IMAGE_OPTIONAL_HEADER_DLLCHARACTERISTICS.IMAGE_DLLCHARACTERISTICS_NO_ISOLATION) != 0);
-                    a_Result = AddFlag(a_Result, "NO_SEH", (value & (int)IMAGE_OPTIONAL_HEADER_DLLCHARACTERISTICS.IMAGE_DLLCHARACTERISTICS_NO_SEH) != 0);
-                    a_Result = AddFlag(a_Result, "NO_BIND", (value & (int)IMAGE_OPTIONAL_HEADER_DLLCHARACTERISTICS.IMAGE_DLLCHARACTERISTICS_NO_BIND) != 0);
-                    a_Result = AddFlag(a_Result, "WDM_DRIVER", (value & (int)IMAGE_OPTIONAL_HEADER_DLLCHARACTERISTICS.IMAGE_DLLCHARACTERISTICS_WDM_DRIVER) != 0);
-                    a_Result = AddFlag(a_Result, "TERMINAL_SERVER_AWARE", (value & (int)IMAGE_OPTIONAL_HEADER_DLLCHARACTERISTICS.IMAGE_DLLCHARACTERISTICS_TERMINAL_SERVER_AWARE) != 0);
-                }
-                return a_Result;
-            }
+            //static private string __GetDllCharacteristics(int value)
+            //{
+            //    var a_Result = "";
+            //    {
+            //        a_Result = AddFlag(a_Result, "DYNAMIC_BASE", (value & (int)IMAGE_OPTIONAL_HEADER_DLLCHARACTERISTICS.IMAGE_DLLCHARACTERISTICS_DYNAMIC_BASE) != 0);
+            //        a_Result = AddFlag(a_Result, "FORCE_INTEGRITY", (value & (int)IMAGE_OPTIONAL_HEADER_DLLCHARACTERISTICS.IMAGE_DLLCHARACTERISTICS_FORCE_INTEGRITY) != 0);
+            //        a_Result = AddFlag(a_Result, "NX_COMPAT", (value & (int)IMAGE_OPTIONAL_HEADER_DLLCHARACTERISTICS.IMAGE_DLLCHARACTERISTICS_NX_COMPAT) != 0);
+            //        a_Result = AddFlag(a_Result, "NO_ISOLATION", (value & (int)IMAGE_OPTIONAL_HEADER_DLLCHARACTERISTICS.IMAGE_DLLCHARACTERISTICS_NO_ISOLATION) != 0);
+            //        a_Result = AddFlag(a_Result, "NO_SEH", (value & (int)IMAGE_OPTIONAL_HEADER_DLLCHARACTERISTICS.IMAGE_DLLCHARACTERISTICS_NO_SEH) != 0);
+            //        a_Result = AddFlag(a_Result, "NO_BIND", (value & (int)IMAGE_OPTIONAL_HEADER_DLLCHARACTERISTICS.IMAGE_DLLCHARACTERISTICS_NO_BIND) != 0);
+            //        a_Result = AddFlag(a_Result, "WDM_DRIVER", (value & (int)IMAGE_OPTIONAL_HEADER_DLLCHARACTERISTICS.IMAGE_DLLCHARACTERISTICS_WDM_DRIVER) != 0);
+            //        a_Result = AddFlag(a_Result, "TERMINAL_SERVER_AWARE", (value & (int)IMAGE_OPTIONAL_HEADER_DLLCHARACTERISTICS.IMAGE_DLLCHARACTERISTICS_TERMINAL_SERVER_AWARE) != 0);
+            //    }
+            //    return a_Result;
+            //}
         }
 
         internal class Metadata
@@ -355,7 +354,7 @@ namespace resource.preview
             {
                 try
                 {
-                    if ((data.ExportedFunctions != null) && (data.ExportedFunctions.Length > 0) && data.HasValidExportDir)
+                    if ((data.ExportedFunctions != null) && (data.ExportedFunctions.Length > 0) /*&& data.HasValidExportDir*/)
                     {
                         Send(context, NAME.EVENT.FOLDER, level, "[[[Export Functions]]]", "", GetArraySize(data.ExportedFunctions), HINT.EMPTY);
                         foreach (var a_Context in data.ExportedFunctions)
@@ -392,7 +391,7 @@ namespace resource.preview
             {
                 try
                 {
-                    if ((data.ImportedFunctions != null) && (data.ImportedFunctions.Length > 0) && data.HasValidImportDir)
+                    if ((data.ImportedFunctions != null) && (data.ImportedFunctions.Length > 0) /*&& data.HasValidImportDir*/)
                     {
                         Send(context, NAME.EVENT.FOLDER, level, "[[[Import Functions]]]", "", GetArraySize(data.ImportedFunctions), HINT.EMPTY);
                         foreach (var a_Context in data.ImportedFunctions)
@@ -539,9 +538,9 @@ namespace resource.preview
                     Send(context, NAME.EVENT.FOLDER, level, "[[[Security]]]", "", TYPE.DIRECTORY, HINT.DATA_TYPE);
                     try
                     {
-                        Send(context, NAME.EVENT.PARAMETER, level + 1, "SHA256", data.SHA256, TYPE.STRING, HINT.DATA_TYPE);
-                        Send(context, NAME.EVENT.PARAMETER, level + 1, "SHA1", data.SHA1, TYPE.STRING, HINT.DATA_TYPE);
-                        Send(context, NAME.EVENT.PARAMETER, level + 1, "MD5", data.MD5, TYPE.STRING, HINT.DATA_TYPE);
+                        Send(context, NAME.EVENT.PARAMETER, level + 1, "SHA256", data.Sha256, TYPE.STRING, HINT.DATA_TYPE);
+                        Send(context, NAME.EVENT.PARAMETER, level + 1, "SHA1", data.Sha1, TYPE.STRING, HINT.DATA_TYPE);
+                        Send(context, NAME.EVENT.PARAMETER, level + 1, "MD5", data.Md5, TYPE.STRING, HINT.DATA_TYPE);
                         Send(context, NAME.EVENT.PARAMETER, level + 1, "ImpHash", data.ImpHash, TYPE.STRING, HINT.DATA_TYPE);
                     }
                     catch (Exception ex)
@@ -551,7 +550,7 @@ namespace resource.preview
                 }
             }
 
-            static private void __Execute(atom.Trace context, int level, IMAGE_DEBUG_DIRECTORY[] data)
+            static private void __Execute(atom.Trace context, int level, ImageDebugDirectory[] data)
             {
                 if (data != null)
                 {
@@ -591,7 +590,7 @@ namespace resource.preview
                 }
             }
 
-            static private void __Execute(atom.Trace context, int level, IMAGE_BASE_RELOCATION[] data)
+            static private void __Execute(atom.Trace context, int level, ImageBaseRelocation[] data)
             {
                 if (data != null)
                 {
@@ -628,7 +627,7 @@ namespace resource.preview
                 }
             }
 
-            static private void __Execute(atom.Trace context, int level, IMAGE_RESOURCE_DIRECTORY data)
+            static private void __Execute(atom.Trace context, int level, ImageResourceDirectory data)
             {
                 if (data != null)
                 {
@@ -648,7 +647,7 @@ namespace resource.preview
                 }
             }
 
-            static private void __Execute(atom.Trace context, int level, RUNTIME_FUNCTION[] data)
+            static private void __Execute(atom.Trace context, int level, RuntimeFunction[] data)
             {
                 if (data != null)
                 {
@@ -686,7 +685,7 @@ namespace resource.preview
                 }
             }
 
-            static private void __Execute(atom.Trace context, int level, IMAGE_TLS_DIRECTORY data)
+            static private void __Execute(atom.Trace context, int level, ImageTlsDirectory data)
             {
                 if (data != null)
                 {
@@ -729,7 +728,7 @@ namespace resource.preview
                 }
             }
 
-            static private void __Execute(atom.Trace context, int level, IMAGE_LOAD_CONFIG_DIRECTORY data)
+            static private void __Execute(atom.Trace context, int level, ImageLoadConfigDirectory data)
             {
                 if (data != null)
                 {
@@ -768,7 +767,7 @@ namespace resource.preview
                 }
             }
 
-            static private void __Execute(atom.Trace context, int level, IMAGE_EXPORT_DIRECTORY data)
+            static private void __Execute(atom.Trace context, int level, ImageExportDirectory data)
             {
                 if (data != null)
                 {
@@ -793,7 +792,7 @@ namespace resource.preview
                 }
             }
 
-            static private void __Execute(atom.Trace context, int level, IMAGE_IMPORT_DESCRIPTOR[] data)
+            static private void __Execute(atom.Trace context, int level, ImageImportDescriptor[] data)
             {
                 if (data != null)
                 {
@@ -824,7 +823,7 @@ namespace resource.preview
                 }
             }
 
-            static private void __Execute(atom.Trace context, int level, IMAGE_BOUND_IMPORT_DESCRIPTOR data)
+            static private void __Execute(atom.Trace context, int level, ImageBoundImportDescriptor data)
             {
                 if (data != null)
                 {
@@ -842,21 +841,20 @@ namespace resource.preview
                 }
             }
 
-            static private void __Execute(atom.Trace context, int level, IMAGE_DELAY_IMPORT_DESCRIPTOR data)
+            static private void __Execute(atom.Trace context, int level, ImageDelayImportDescriptor data)
             {
                 if (data != null)
                 {
                     Send(context, NAME.EVENT.FOLDER, level, "[[[Delay Import]]]", "", TYPE.DIRECTORY, HINT.DATA_TYPE);
                     try
                     {
-                        Send(context, NAME.EVENT.PARAMETER, level + 1, "[[[TimeStamp]]]", GetHex(data.dwTimeStamp), TYPE.INTEGER, HINT.DATA_TYPE);
-                        Send(context, NAME.EVENT.PARAMETER, level + 1, "[[[Attributes]]]", GetHex(data.grAttrs), TYPE.FLAGS, HINT.DATA_TYPE);
-                        Send(context, NAME.EVENT.PARAMETER, level + 1, "[[[Name]]]", GetHex(data.szName), TYPE.POINTER, HINT.DATA_TYPE);
-                        Send(context, NAME.EVENT.PARAMETER, level + 1, "[[[Mod]]]", GetHex(data.phmod), TYPE.POINTER, HINT.DATA_TYPE);
-                        Send(context, NAME.EVENT.PARAMETER, level + 1, "[[[IAT]]]", GetHex(data.pIAT), TYPE.POINTER, HINT.DATA_TYPE);
-                        Send(context, NAME.EVENT.PARAMETER, level + 1, "[[[INT]]]", GetHex(data.pINT), TYPE.POINTER, HINT.DATA_TYPE);
-                        Send(context, NAME.EVENT.PARAMETER, level + 1, "[[[Bound]]] IAT", GetHex(data.pBoundIAT), TYPE.POINTER, HINT.DATA_TYPE);
-                        Send(context, NAME.EVENT.PARAMETER, level + 1, "[[[Unload]]] IAT", GetHex(data.pUnloadIAT), TYPE.POINTER, HINT.DATA_TYPE);
+                        Send(context, NAME.EVENT.PARAMETER, level + 1, "[[[TimeStamp]]]", GetHex(data.DwTimeStamp), TYPE.INTEGER, HINT.DATA_TYPE);
+                        Send(context, NAME.EVENT.PARAMETER, level + 1, "[[[Attributes]]]", GetHex(data.GrAttrs), TYPE.FLAGS, HINT.DATA_TYPE);
+                        Send(context, NAME.EVENT.PARAMETER, level + 1, "[[[Name]]]", GetHex(data.SzName), TYPE.POINTER, HINT.DATA_TYPE);
+                        Send(context, NAME.EVENT.PARAMETER, level + 1, "[[[Mod]]]", GetHex(data.Phmod), TYPE.POINTER, HINT.DATA_TYPE);
+                        Send(context, NAME.EVENT.PARAMETER, level + 1, "[[[PBound IAT]]]", GetHex(data.PBoundIAT), TYPE.POINTER, HINT.DATA_TYPE);
+                        Send(context, NAME.EVENT.PARAMETER, level + 1, "[[[INT]]]", GetHex(data.PInt), TYPE.POINTER, HINT.DATA_TYPE);
+                        Send(context, NAME.EVENT.PARAMETER, level + 1, "[[[Unload IAT]]] IAT", GetHex(data.PUnloadIAT), TYPE.POINTER, HINT.DATA_TYPE);
                     }
                     catch (Exception ex)
                     {
@@ -865,7 +863,7 @@ namespace resource.preview
                 }
             }
 
-            static private void __Execute(atom.Trace context, int level, IMAGE_COR20_HEADER data)
+            static private void __Execute(atom.Trace context, int level, ImageCor20Header data)
             {
                 if (data != null)
                 {
@@ -874,13 +872,13 @@ namespace resource.preview
                     {
                         {
                             Send(context, NAME.EVENT.PARAMETER, level + 1, "[[[Runtime Version]]]", GetVersion(data.MajorRuntimeVersion, data.MinorRuntimeVersion), TYPE.VERSION, HINT.DATA_TYPE);
-                            Send(context, NAME.EVENT.PARAMETER, level + 1, "[[[Flags]]]", GetHex(data.Flags), TYPE.FLAGS, HINT.DATA_TYPE);
+                            Send(context, NAME.EVENT.PARAMETER, level + 1, "[[[Flags]]]", data.Flags.ToString(), TYPE.FLAGS, HINT.DATA_TYPE);
                         }
                         {
                             Send(context, NAME.EVENT.PARAMETER, level + 1, "[[[Entry Point]]]", "", TYPE.STRUCT, HINT.DATA_TYPE);
                             {
                                 Send(context, NAME.EVENT.PARAMETER, level + 2, "[[[Token]]]", data.EntryPointToken, TYPE.INTEGER, HINT.DATA_TYPE);
-                                Send(context, NAME.EVENT.PARAMETER, level + 2, "[[[Relative Virtual Address]]]", data.EntryPointRVA, TYPE.INTEGER, HINT.DATA_TYPE);
+                                Send(context, NAME.EVENT.PARAMETER, level + 2, "[[[Relative Virtual Address]]]", data.EntryPointRva, TYPE.INTEGER, HINT.DATA_TYPE);
                             }
                         }
                         if (data.MetaData != null)
@@ -959,7 +957,7 @@ namespace resource.preview
                     {
                         foreach (var a_Context in data.ImageSectionHeaders)
                         {
-                            Send(context, NAME.EVENT.PARAMETER, level + 1, a_Context.NameResolved, "", TYPE.SECTION, HINT.DATA_TYPE);
+                            Send(context, NAME.EVENT.PARAMETER, level + 1, a_Context.Name, "", TYPE.SECTION, HINT.DATA_TYPE);
                             if (GetState() == NAME.STATE.CANCEL)
                             {
                                 return;
@@ -975,7 +973,7 @@ namespace resource.preview
                                 Send(context, NAME.EVENT.PARAMETER, level + 2, "[[[Pointer To Line Numbers]]]", GetHex(a_Context.PointerToLinenumbers), TYPE.POINTER, HINT.DATA_TYPE);
                                 Send(context, NAME.EVENT.PARAMETER, level + 2, "[[[Number Of Relocations]]]", a_Context.NumberOfRelocations, TYPE.INTEGER, HINT.DATA_TYPE);
                                 Send(context, NAME.EVENT.PARAMETER, level + 2, "[[[Number Of Line Numbers]]]", a_Context.NumberOfLinenumbers, TYPE.INTEGER, HINT.DATA_TYPE);
-                                Send(context, NAME.EVENT.PARAMETER, level + 2, "[[[Characteristics]]]", __GetCharacteristics(a_Context.Characteristics), TYPE.FLAGS, HINT.DATA_TYPE);
+                                Send(context, NAME.EVENT.PARAMETER, level + 2, "[[[Characteristics]]]", a_Context.Characteristics.ToString(), TYPE.FLAGS, HINT.DATA_TYPE);
                             }
                         }
                     }
@@ -986,61 +984,60 @@ namespace resource.preview
                 }
             }
 
-            static private string __GetCharacteristics(uint value)
-            {
-                var a_Result = "";
-                {
-                    a_Result = AddFlag(a_Result, "TYPE_NO_PAD", (value & (uint)IMAGE_SECTION_HEADER_CHARACTERISTICS.IMAGE_SCN_TYPE_NO_PAD) != 0);
-                    a_Result = AddFlag(a_Result, "CNT_CODE", (value & (uint)IMAGE_SECTION_HEADER_CHARACTERISTICS.IMAGE_SCN_CNT_CODE) != 0);
-                    a_Result = AddFlag(a_Result, "CNT_INITIALIZED_DATA", (value & (uint)IMAGE_SECTION_HEADER_CHARACTERISTICS.IMAGE_SCN_CNT_INITIALIZED_DATA) != 0);
-                    a_Result = AddFlag(a_Result, "CNT_UNINITIALIZED_DATA", (value & (uint)IMAGE_SECTION_HEADER_CHARACTERISTICS.IMAGE_SCN_CNT_UNINITIALIZED_DATA) != 0);
-                    a_Result = AddFlag(a_Result, "LNK_OTHER", (value & (uint)IMAGE_SECTION_HEADER_CHARACTERISTICS.IMAGE_SCN_LNK_OTHER) != 0);
-                    a_Result = AddFlag(a_Result, "LNK_INFO", (value & (uint)IMAGE_SECTION_HEADER_CHARACTERISTICS.IMAGE_SCN_LNK_INFO) != 0);
-                    a_Result = AddFlag(a_Result, "LNK_REMOVE", (value & (uint)IMAGE_SECTION_HEADER_CHARACTERISTICS.IMAGE_SCN_LNK_REMOVE) != 0);
-                    a_Result = AddFlag(a_Result, "LNK_COMDAT", (value & (uint)IMAGE_SECTION_HEADER_CHARACTERISTICS.IMAGE_SCN_LNK_COMDAT) != 0);
-                    a_Result = AddFlag(a_Result, "NO_DEFER_SPEC_EXC", (value & (uint)IMAGE_SECTION_HEADER_CHARACTERISTICS.IMAGE_SCN_NO_DEFER_SPEC_EXC) != 0);
-                    a_Result = AddFlag(a_Result, "GPREL", (value & (uint)IMAGE_SECTION_HEADER_CHARACTERISTICS.IMAGE_SCN_GPREL) != 0);
-                    a_Result = AddFlag(a_Result, "MEM_PURGEABLE", (value & (uint)IMAGE_SECTION_HEADER_CHARACTERISTICS.IMAGE_SCN_MEM_PURGEABLE) != 0);
-                    a_Result = AddFlag(a_Result, "MEM_LOCKED", (value & (uint)IMAGE_SECTION_HEADER_CHARACTERISTICS.IMAGE_SCN_MEM_LOCKED) != 0);
-                    a_Result = AddFlag(a_Result, "MEM_PRELOAD", (value & (uint)IMAGE_SECTION_HEADER_CHARACTERISTICS.IMAGE_SCN_MEM_PRELOAD) != 0);
-                    a_Result = AddFlag(a_Result, "ALIGN_1BYTES", (value & (uint)IMAGE_SECTION_HEADER_CHARACTERISTICS.IMAGE_SCN_ALIGN_1BYTES) != 0);
-                    a_Result = AddFlag(a_Result, "ALIGN_2BYTES", (value & (uint)IMAGE_SECTION_HEADER_CHARACTERISTICS.IMAGE_SCN_ALIGN_2BYTES) != 0);
-                    a_Result = AddFlag(a_Result, "ALIGN_4BYTES", (value & (uint)IMAGE_SECTION_HEADER_CHARACTERISTICS.IMAGE_SCN_ALIGN_4BYTES) != 0);
-                    a_Result = AddFlag(a_Result, "ALIGN_8BYTES", (value & (uint)IMAGE_SECTION_HEADER_CHARACTERISTICS.IMAGE_SCN_ALIGN_8BYTES) != 0);
-                    a_Result = AddFlag(a_Result, "ALIGN_16BYTES", (value & (uint)IMAGE_SECTION_HEADER_CHARACTERISTICS.IMAGE_SCN_ALIGN_16BYTES) != 0);
-                    a_Result = AddFlag(a_Result, "ALIGN_32BYTES", (value & (uint)IMAGE_SECTION_HEADER_CHARACTERISTICS.IMAGE_SCN_ALIGN_32BYTES) != 0);
-                    a_Result = AddFlag(a_Result, "ALIGN_64BYTES", (value & (uint)IMAGE_SECTION_HEADER_CHARACTERISTICS.IMAGE_SCN_ALIGN_64BYTES) != 0);
-                    a_Result = AddFlag(a_Result, "ALIGN_128BYTES", (value & (uint)IMAGE_SECTION_HEADER_CHARACTERISTICS.IMAGE_SCN_ALIGN_128BYTES) != 0);
-                    a_Result = AddFlag(a_Result, "ALIGN_256BYTES", (value & (uint)IMAGE_SECTION_HEADER_CHARACTERISTICS.IMAGE_SCN_ALIGN_256BYTES) != 0);
-                    a_Result = AddFlag(a_Result, "ALIGN_512BYTES", (value & (uint)IMAGE_SECTION_HEADER_CHARACTERISTICS.IMAGE_SCN_ALIGN_512BYTES) != 0);
-                    a_Result = AddFlag(a_Result, "ALIGN_1024BYTES", (value & (uint)IMAGE_SECTION_HEADER_CHARACTERISTICS.IMAGE_SCN_ALIGN_1024BYTES) != 0);
-                    a_Result = AddFlag(a_Result, "ALIGN_2048BYTES", (value & (uint)IMAGE_SECTION_HEADER_CHARACTERISTICS.IMAGE_SCN_ALIGN_2048BYTES) != 0);
-                    a_Result = AddFlag(a_Result, "ALIGN_4096BYTES", (value & (uint)IMAGE_SECTION_HEADER_CHARACTERISTICS.IMAGE_SCN_ALIGN_4096BYTES) != 0);
-                    a_Result = AddFlag(a_Result, "ALIGN_8192BYTES", (value & (uint)IMAGE_SECTION_HEADER_CHARACTERISTICS.IMAGE_SCN_ALIGN_8192BYTES) != 0);
-                    a_Result = AddFlag(a_Result, "LNK_NRELOC_OVFL", (value & (uint)IMAGE_SECTION_HEADER_CHARACTERISTICS.IMAGE_SCN_LNK_NRELOC_OVFL) != 0);
-                    a_Result = AddFlag(a_Result, "MEM_DISCARDABLE", (value & (uint)IMAGE_SECTION_HEADER_CHARACTERISTICS.IMAGE_SCN_MEM_DISCARDABLE) != 0);
-                    a_Result = AddFlag(a_Result, "MEM_NOT_CACHED", (value & (uint)IMAGE_SECTION_HEADER_CHARACTERISTICS.IMAGE_SCN_MEM_NOT_CACHED) != 0);
-                    a_Result = AddFlag(a_Result, "MEM_NOT_PAGED", (value & (uint)IMAGE_SECTION_HEADER_CHARACTERISTICS.IMAGE_SCN_MEM_NOT_PAGED) != 0);
-                    a_Result = AddFlag(a_Result, "MEM_SHARED", (value & (uint)IMAGE_SECTION_HEADER_CHARACTERISTICS.IMAGE_SCN_MEM_SHARED) != 0);
-                    a_Result = AddFlag(a_Result, "MEM_EXECUTE", (value & (uint)IMAGE_SECTION_HEADER_CHARACTERISTICS.IMAGE_SCN_MEM_EXECUTE) != 0);
-                    a_Result = AddFlag(a_Result, "MEM_READ", (value & (uint)IMAGE_SECTION_HEADER_CHARACTERISTICS.IMAGE_SCN_MEM_READ) != 0);
-                    a_Result = AddFlag(a_Result, "MEM_WRITE", (value & (uint)IMAGE_SECTION_HEADER_CHARACTERISTICS.IMAGE_SCN_MEM_WRITE) != 0);
-                }
-                return a_Result;
-            }
+            //static private string __GetCharacteristics(uint value)
+            //{
+            //    var a_Result = "";
+            //    {
+            //        a_Result = AddFlag(a_Result, "TYPE_NO_PAD", (value & (uint)IMAGE_SECTION_HEADER_CHARACTERISTICS.IMAGE_SCN_TYPE_NO_PAD) != 0);
+            //        a_Result = AddFlag(a_Result, "CNT_CODE", (value & (uint)IMAGE_SECTION_HEADER_CHARACTERISTICS.IMAGE_SCN_CNT_CODE) != 0);
+            //        a_Result = AddFlag(a_Result, "CNT_INITIALIZED_DATA", (value & (uint)IMAGE_SECTION_HEADER_CHARACTERISTICS.IMAGE_SCN_CNT_INITIALIZED_DATA) != 0);
+            //        a_Result = AddFlag(a_Result, "CNT_UNINITIALIZED_DATA", (value & (uint)IMAGE_SECTION_HEADER_CHARACTERISTICS.IMAGE_SCN_CNT_UNINITIALIZED_DATA) != 0);
+            //        a_Result = AddFlag(a_Result, "LNK_OTHER", (value & (uint)IMAGE_SECTION_HEADER_CHARACTERISTICS.IMAGE_SCN_LNK_OTHER) != 0);
+            //        a_Result = AddFlag(a_Result, "LNK_INFO", (value & (uint)IMAGE_SECTION_HEADER_CHARACTERISTICS.IMAGE_SCN_LNK_INFO) != 0);
+            //        a_Result = AddFlag(a_Result, "LNK_REMOVE", (value & (uint)IMAGE_SECTION_HEADER_CHARACTERISTICS.IMAGE_SCN_LNK_REMOVE) != 0);
+            //        a_Result = AddFlag(a_Result, "LNK_COMDAT", (value & (uint)IMAGE_SECTION_HEADER_CHARACTERISTICS.IMAGE_SCN_LNK_COMDAT) != 0);
+            //        a_Result = AddFlag(a_Result, "NO_DEFER_SPEC_EXC", (value & (uint)IMAGE_SECTION_HEADER_CHARACTERISTICS.IMAGE_SCN_NO_DEFER_SPEC_EXC) != 0);
+            //        a_Result = AddFlag(a_Result, "GPREL", (value & (uint)IMAGE_SECTION_HEADER_CHARACTERISTICS.IMAGE_SCN_GPREL) != 0);
+            //        a_Result = AddFlag(a_Result, "MEM_PURGEABLE", (value & (uint)IMAGE_SECTION_HEADER_CHARACTERISTICS.IMAGE_SCN_MEM_PURGEABLE) != 0);
+            //        a_Result = AddFlag(a_Result, "MEM_LOCKED", (value & (uint)IMAGE_SECTION_HEADER_CHARACTERISTICS.IMAGE_SCN_MEM_LOCKED) != 0);
+            //        a_Result = AddFlag(a_Result, "MEM_PRELOAD", (value & (uint)IMAGE_SECTION_HEADER_CHARACTERISTICS.IMAGE_SCN_MEM_PRELOAD) != 0);
+            //        a_Result = AddFlag(a_Result, "ALIGN_1BYTES", (value & (uint)IMAGE_SECTION_HEADER_CHARACTERISTICS.IMAGE_SCN_ALIGN_1BYTES) != 0);
+            //        a_Result = AddFlag(a_Result, "ALIGN_2BYTES", (value & (uint)IMAGE_SECTION_HEADER_CHARACTERISTICS.IMAGE_SCN_ALIGN_2BYTES) != 0);
+            //        a_Result = AddFlag(a_Result, "ALIGN_4BYTES", (value & (uint)IMAGE_SECTION_HEADER_CHARACTERISTICS.IMAGE_SCN_ALIGN_4BYTES) != 0);
+            //        a_Result = AddFlag(a_Result, "ALIGN_8BYTES", (value & (uint)IMAGE_SECTION_HEADER_CHARACTERISTICS.IMAGE_SCN_ALIGN_8BYTES) != 0);
+            //        a_Result = AddFlag(a_Result, "ALIGN_16BYTES", (value & (uint)IMAGE_SECTION_HEADER_CHARACTERISTICS.IMAGE_SCN_ALIGN_16BYTES) != 0);
+            //        a_Result = AddFlag(a_Result, "ALIGN_32BYTES", (value & (uint)IMAGE_SECTION_HEADER_CHARACTERISTICS.IMAGE_SCN_ALIGN_32BYTES) != 0);
+            //        a_Result = AddFlag(a_Result, "ALIGN_64BYTES", (value & (uint)IMAGE_SECTION_HEADER_CHARACTERISTICS.IMAGE_SCN_ALIGN_64BYTES) != 0);
+            //        a_Result = AddFlag(a_Result, "ALIGN_128BYTES", (value & (uint)IMAGE_SECTION_HEADER_CHARACTERISTICS.IMAGE_SCN_ALIGN_128BYTES) != 0);
+            //        a_Result = AddFlag(a_Result, "ALIGN_256BYTES", (value & (uint)IMAGE_SECTION_HEADER_CHARACTERISTICS.IMAGE_SCN_ALIGN_256BYTES) != 0);
+            //        a_Result = AddFlag(a_Result, "ALIGN_512BYTES", (value & (uint)IMAGE_SECTION_HEADER_CHARACTERISTICS.IMAGE_SCN_ALIGN_512BYTES) != 0);
+            //        a_Result = AddFlag(a_Result, "ALIGN_1024BYTES", (value & (uint)IMAGE_SECTION_HEADER_CHARACTERISTICS.IMAGE_SCN_ALIGN_1024BYTES) != 0);
+            //        a_Result = AddFlag(a_Result, "ALIGN_2048BYTES", (value & (uint)IMAGE_SECTION_HEADER_CHARACTERISTICS.IMAGE_SCN_ALIGN_2048BYTES) != 0);
+            //        a_Result = AddFlag(a_Result, "ALIGN_4096BYTES", (value & (uint)IMAGE_SECTION_HEADER_CHARACTERISTICS.IMAGE_SCN_ALIGN_4096BYTES) != 0);
+            //        a_Result = AddFlag(a_Result, "ALIGN_8192BYTES", (value & (uint)IMAGE_SECTION_HEADER_CHARACTERISTICS.IMAGE_SCN_ALIGN_8192BYTES) != 0);
+            //        a_Result = AddFlag(a_Result, "LNK_NRELOC_OVFL", (value & (uint)IMAGE_SECTION_HEADER_CHARACTERISTICS.IMAGE_SCN_LNK_NRELOC_OVFL) != 0);
+            //        a_Result = AddFlag(a_Result, "MEM_DISCARDABLE", (value & (uint)IMAGE_SECTION_HEADER_CHARACTERISTICS.IMAGE_SCN_MEM_DISCARDABLE) != 0);
+            //        a_Result = AddFlag(a_Result, "MEM_NOT_CACHED", (value & (uint)IMAGE_SECTION_HEADER_CHARACTERISTICS.IMAGE_SCN_MEM_NOT_CACHED) != 0);
+            //        a_Result = AddFlag(a_Result, "MEM_NOT_PAGED", (value & (uint)IMAGE_SECTION_HEADER_CHARACTERISTICS.IMAGE_SCN_MEM_NOT_PAGED) != 0);
+            //        a_Result = AddFlag(a_Result, "MEM_SHARED", (value & (uint)IMAGE_SECTION_HEADER_CHARACTERISTICS.IMAGE_SCN_MEM_SHARED) != 0);
+            //        a_Result = AddFlag(a_Result, "MEM_EXECUTE", (value & (uint)IMAGE_SECTION_HEADER_CHARACTERISTICS.IMAGE_SCN_MEM_EXECUTE) != 0);
+            //        a_Result = AddFlag(a_Result, "MEM_READ", (value & (uint)IMAGE_SECTION_HEADER_CHARACTERISTICS.IMAGE_SCN_MEM_READ) != 0);
+            //        a_Result = AddFlag(a_Result, "MEM_WRITE", (value & (uint)IMAGE_SECTION_HEADER_CHARACTERISTICS.IMAGE_SCN_MEM_WRITE) != 0);
+            //    }
+            //    return a_Result;
+            //}
         }
 
         internal class Certificate
         {
             static public void Execute(atom.Trace context, int level, PeFile data)
             {
-                if ((data.WinCertificate != null) && (data.PKCS7 != null))
+                if (data.WinCertificate != null)
                 {
                     Send(context, NAME.EVENT.FOLDER, level, "[[[Certificate]]]", "");
                     try
                     {
                         __Execute(context, level + 1, data.WinCertificate);
-                        __Execute(context, level + 1, data.PKCS7);
                     }
                     catch (Exception ex)
                     {
@@ -1049,16 +1046,16 @@ namespace resource.preview
                 }
             }
 
-            static private void __Execute(atom.Trace context, int level, WIN_CERTIFICATE data)
+            static private void __Execute(atom.Trace context, int level, WinCertificate data)
             {
                 if (data != null)
                 {
                     Send(context, NAME.EVENT.PARAMETER, level, "Windows", "");
                     try
                     {
-                        Send(context, NAME.EVENT.PARAMETER, level + 1, "[[[Type]]]", __GetType(data.wCertificateType), TYPE.ENUM, HINT.DATA_TYPE);
-                        Send(context, NAME.EVENT.PARAMETER, level + 1, "[[[Size]]]", data.dwLength, TYPE.INTEGER, HINT.DATA_TYPE);
-                        Send(context, NAME.EVENT.PARAMETER, level + 1, "[[[Revision]]]", data.wRevision, TYPE.INTEGER, HINT.DATA_TYPE);
+                        Send(context, NAME.EVENT.PARAMETER, level + 1, "[[[Type]]]", data.WCertificateType.ToString(), TYPE.ENUM, HINT.DATA_TYPE);
+                        Send(context, NAME.EVENT.PARAMETER, level + 1, "[[[Size]]]", data.DwLength, TYPE.INTEGER, HINT.DATA_TYPE);
+                        Send(context, NAME.EVENT.PARAMETER, level + 1, "[[[Revision]]]", data.WRevision, TYPE.INTEGER, HINT.DATA_TYPE);
                     }
                     catch (Exception ex)
                     {
@@ -1067,99 +1064,99 @@ namespace resource.preview
                 }
             }
 
-            static private void __Execute(atom.Trace context, int level, X509Certificate2 data)
-            {
-                if (data != null)
-                {
-                    try
-                    {
-                        Send(context, NAME.EVENT.PARAMETER, level, "X509", "");
-                        {
-                            Send(context, NAME.EVENT.PARAMETER, level + 1, "[[[Friendly Name]]]", data.FriendlyName, TYPE.STRING, HINT.DATA_TYPE);
-                            Send(context, NAME.EVENT.PARAMETER, level + 1, "[[[Subject Name]]]", data.SubjectName.Name, TYPE.STRING, HINT.DATA_TYPE);
-                            Send(context, NAME.EVENT.PARAMETER, level + 1, "[[[Issuer Name]]]", (data.IssuerName != null) ? data.IssuerName.Name : "", TYPE.STRING, HINT.DATA_TYPE);
-                            Send(context, NAME.EVENT.PARAMETER, level + 1, "[[[Serial Number]]]", data.SerialNumber, TYPE.STRING, HINT.DATA_TYPE);
-                            Send(context, NAME.EVENT.PARAMETER, level + 1, "[[[Thumb Print]]]", data.Thumbprint, TYPE.STRING, HINT.DATA_TYPE);
-                            Send(context, NAME.EVENT.PARAMETER, level + 1, "[[[Archived]]]", GetBool(data.Archived), TYPE.BOOLEAN, HINT.DATA_TYPE);
-                            Send(context, NAME.EVENT.PARAMETER, level + 1, "[[[Version]]]", (uint)data.Version, TYPE.INTEGER, HINT.DATA_TYPE);
-                        }
-                        if (data.NotBefore != null)
-                        {
-                            Send(context, NAME.EVENT.PARAMETER, level + 1, "[[[Not Before]]]", data.NotBefore.ToString(), TYPE.DATE, HINT.DATA_TYPE);
-                        }
-                        if (data.NotAfter != null)
-                        {
-                            Send(context, NAME.EVENT.PARAMETER, level + 1, "[[[Not After]]]", data.NotAfter.ToString(), TYPE.DATE, HINT.DATA_TYPE);
-                        }
-                        if (data.PublicKey != null)
-                        {
-                            Send(context, NAME.EVENT.PARAMETER, level + 1, "[[[Public Key]]]", "", TYPE.STRUCT, HINT.DATA_TYPE);
-                            if (data.PublicKey.Oid != null)
-                            {
-                                Send(context, NAME.EVENT.PARAMETER, level + 2, "[[[Friendly Name]]]", data.PublicKey.Oid.FriendlyName, TYPE.STRING, HINT.DATA_TYPE);
-                                Send(context, NAME.EVENT.PARAMETER, level + 2, "[[[Value]]]", data.PublicKey.Oid.Value, TYPE.STRING, HINT.DATA_TYPE);
-                            }
-                            if (data.PublicKey.Key != null)
-                            {
-                                Send(context, NAME.EVENT.PARAMETER, level + 2, "[[[Exchange Algorithm]]]", data.PublicKey.Key.KeyExchangeAlgorithm, TYPE.STRING, HINT.DATA_TYPE);
-                                Send(context, NAME.EVENT.PARAMETER, level + 2, "[[[Size]]]", (uint)data.PublicKey.Key.KeySize, TYPE.INTEGER, HINT.DATA_TYPE);
-                            }
-                        }
-                        if (data.PrivateKey != null)
-                        {
-                            Send(context, NAME.EVENT.PARAMETER, level + 1, "[[[Private Key]]]", "", TYPE.STRUCT, HINT.DATA_TYPE);
-                            {
-                                Send(context, NAME.EVENT.PARAMETER, level + 2, "[[[Exchange Algorithm]]]", data.PrivateKey.KeyExchangeAlgorithm, TYPE.STRING, HINT.DATA_TYPE);
-                                Send(context, NAME.EVENT.PARAMETER, level + 2, "[[[Signature Algorithm]]]", data.PrivateKey.SignatureAlgorithm, TYPE.STRING, HINT.DATA_TYPE);
-                                Send(context, NAME.EVENT.PARAMETER, level + 2, "[[[Size]]]", (uint)data.PrivateKey.KeySize, TYPE.INTEGER, HINT.DATA_TYPE);
-                            }
-                        }
-                        if (data.SignatureAlgorithm != null)
-                        {
-                            Send(context, NAME.EVENT.PARAMETER, level + 1, "[[[Signature Algorithm]]]", "", TYPE.STRUCT, HINT.DATA_TYPE);
-                            {
-                                Send(context, NAME.EVENT.PARAMETER, level + 2, "[[[Friendly Name]]]", data.SignatureAlgorithm.FriendlyName, TYPE.STRING, HINT.DATA_TYPE);
-                                Send(context, NAME.EVENT.PARAMETER, level + 2, "[[[Value]]]", data.SignatureAlgorithm.Value, TYPE.STRING, HINT.DATA_TYPE);
-                            }
-                        }
-                        if (data.Extensions != null)
-                        {
-                            Send(context, NAME.EVENT.PARAMETER, level + 1, "[[[Extensions]]]", "", TYPE.STRUCT, HINT.DATA_TYPE);
-                            foreach (var a_Context in data.Extensions)
-                            {
-                                if (GetState() == NAME.STATE.CANCEL)
-                                {
-                                    return;
-                                }
-                                if (a_Context.Oid != null)
-                                {
-                                    Send(context, NAME.EVENT.PARAMETER, level + 2, a_Context.Oid.FriendlyName, "", TYPE.STRUCT, HINT.DATA_TYPE);
-                                    {
-                                        Send(context, NAME.EVENT.PARAMETER, level + 3, "[[[Friendly Name]]]", a_Context.Oid.FriendlyName, TYPE.STRING, HINT.DATA_TYPE);
-                                        Send(context, NAME.EVENT.PARAMETER, level + 3, "[[[Value]]]", a_Context.Oid.Value, TYPE.STRING, HINT.DATA_TYPE);
-                                        Send(context, NAME.EVENT.PARAMETER, level + 3, "[[[Critical]]]", GetBool(a_Context.Critical), TYPE.BOOLEAN, HINT.DATA_TYPE);
-                                    }
-                                }
-                            }
-                        }
-                    }
-                    catch (Exception ex)
-                    {
-                        Send(context, NAME.EVENT.ERROR, level + 1, ex.Message, "");
-                    }
-                }
-            }
+            //static private void __Execute(atom.Trace context, int level, X509Certificate2 data)
+            //{
+            //    if (data != null)
+            //    {
+            //        try
+            //        {
+            //            Send(context, NAME.EVENT.PARAMETER, level, "X509", "");
+            //            {
+            //                Send(context, NAME.EVENT.PARAMETER, level + 1, "[[[Friendly Name]]]", data.FriendlyName, TYPE.STRING, HINT.DATA_TYPE);
+            //                Send(context, NAME.EVENT.PARAMETER, level + 1, "[[[Subject Name]]]", data.SubjectName.Name, TYPE.STRING, HINT.DATA_TYPE);
+            //                Send(context, NAME.EVENT.PARAMETER, level + 1, "[[[Issuer Name]]]", (data.IssuerName != null) ? data.IssuerName.Name : "", TYPE.STRING, HINT.DATA_TYPE);
+            //                Send(context, NAME.EVENT.PARAMETER, level + 1, "[[[Serial Number]]]", data.SerialNumber, TYPE.STRING, HINT.DATA_TYPE);
+            //                Send(context, NAME.EVENT.PARAMETER, level + 1, "[[[Thumb Print]]]", data.Thumbprint, TYPE.STRING, HINT.DATA_TYPE);
+            //                Send(context, NAME.EVENT.PARAMETER, level + 1, "[[[Archived]]]", GetBool(data.Archived), TYPE.BOOLEAN, HINT.DATA_TYPE);
+            //                Send(context, NAME.EVENT.PARAMETER, level + 1, "[[[Version]]]", (uint)data.Version, TYPE.INTEGER, HINT.DATA_TYPE);
+            //            }
+            //            if (data.NotBefore != null)
+            //            {
+            //                Send(context, NAME.EVENT.PARAMETER, level + 1, "[[[Not Before]]]", data.NotBefore.ToString(), TYPE.DATE, HINT.DATA_TYPE);
+            //            }
+            //            if (data.NotAfter != null)
+            //            {
+            //                Send(context, NAME.EVENT.PARAMETER, level + 1, "[[[Not After]]]", data.NotAfter.ToString(), TYPE.DATE, HINT.DATA_TYPE);
+            //            }
+            //            if (data.PublicKey != null)
+            //            {
+            //                Send(context, NAME.EVENT.PARAMETER, level + 1, "[[[Public Key]]]", "", TYPE.STRUCT, HINT.DATA_TYPE);
+            //                if (data.PublicKey.Oid != null)
+            //                {
+            //                    Send(context, NAME.EVENT.PARAMETER, level + 2, "[[[Friendly Name]]]", data.PublicKey.Oid.FriendlyName, TYPE.STRING, HINT.DATA_TYPE);
+            //                    Send(context, NAME.EVENT.PARAMETER, level + 2, "[[[Value]]]", data.PublicKey.Oid.Value, TYPE.STRING, HINT.DATA_TYPE);
+            //                }
+            //                if (data.PublicKey.Key != null)
+            //                {
+            //                    Send(context, NAME.EVENT.PARAMETER, level + 2, "[[[Exchange Algorithm]]]", data.PublicKey.Key.KeyExchangeAlgorithm, TYPE.STRING, HINT.DATA_TYPE);
+            //                    Send(context, NAME.EVENT.PARAMETER, level + 2, "[[[Size]]]", (uint)data.PublicKey.Key.KeySize, TYPE.INTEGER, HINT.DATA_TYPE);
+            //                }
+            //            }
+            //            if (data.PrivateKey != null)
+            //            {
+            //                Send(context, NAME.EVENT.PARAMETER, level + 1, "[[[Private Key]]]", "", TYPE.STRUCT, HINT.DATA_TYPE);
+            //                {
+            //                    Send(context, NAME.EVENT.PARAMETER, level + 2, "[[[Exchange Algorithm]]]", data.PrivateKey.KeyExchangeAlgorithm, TYPE.STRING, HINT.DATA_TYPE);
+            //                    Send(context, NAME.EVENT.PARAMETER, level + 2, "[[[Signature Algorithm]]]", data.PrivateKey.SignatureAlgorithm, TYPE.STRING, HINT.DATA_TYPE);
+            //                    Send(context, NAME.EVENT.PARAMETER, level + 2, "[[[Size]]]", (uint)data.PrivateKey.KeySize, TYPE.INTEGER, HINT.DATA_TYPE);
+            //                }
+            //            }
+            //            if (data.SignatureAlgorithm != null)
+            //            {
+            //                Send(context, NAME.EVENT.PARAMETER, level + 1, "[[[Signature Algorithm]]]", "", TYPE.STRUCT, HINT.DATA_TYPE);
+            //                {
+            //                    Send(context, NAME.EVENT.PARAMETER, level + 2, "[[[Friendly Name]]]", data.SignatureAlgorithm.FriendlyName, TYPE.STRING, HINT.DATA_TYPE);
+            //                    Send(context, NAME.EVENT.PARAMETER, level + 2, "[[[Value]]]", data.SignatureAlgorithm.Value, TYPE.STRING, HINT.DATA_TYPE);
+            //                }
+            //            }
+            //            if (data.Extensions != null)
+            //            {
+            //                Send(context, NAME.EVENT.PARAMETER, level + 1, "[[[Extensions]]]", "", TYPE.STRUCT, HINT.DATA_TYPE);
+            //                foreach (var a_Context in data.Extensions)
+            //                {
+            //                    if (GetState() == NAME.STATE.CANCEL)
+            //                    {
+            //                        return;
+            //                    }
+            //                    if (a_Context.Oid != null)
+            //                    {
+            //                        Send(context, NAME.EVENT.PARAMETER, level + 2, a_Context.Oid.FriendlyName, "", TYPE.STRUCT, HINT.DATA_TYPE);
+            //                        {
+            //                            Send(context, NAME.EVENT.PARAMETER, level + 3, "[[[Friendly Name]]]", a_Context.Oid.FriendlyName, TYPE.STRING, HINT.DATA_TYPE);
+            //                            Send(context, NAME.EVENT.PARAMETER, level + 3, "[[[Value]]]", a_Context.Oid.Value, TYPE.STRING, HINT.DATA_TYPE);
+            //                            Send(context, NAME.EVENT.PARAMETER, level + 3, "[[[Critical]]]", GetBool(a_Context.Critical), TYPE.BOOLEAN, HINT.DATA_TYPE);
+            //                        }
+            //                    }
+            //                }
+            //            }
+            //        }
+            //        catch (Exception ex)
+            //        {
+            //            Send(context, NAME.EVENT.ERROR, level + 1, ex.Message, "");
+            //        }
+            //    }
+            //}
 
-            static private string __GetType(int value)
-            {
-                switch ((WIN_CERTIFICATE_TYPE)value)
-                {
-                    case WIN_CERTIFICATE_TYPE.WIN_CERT_TYPE_PKCS_SIGNED_DATA: return "PKCS_SIGNED_DATA";
-                    case WIN_CERTIFICATE_TYPE.WIN_CERT_TYPE_EFI_PKCS115: return "EFI_PKCS115";
-                    case WIN_CERTIFICATE_TYPE.WIN_CERT_TYPE_EFI_GUID: return "EFI_GUID";
-                }
-                return value.ToString();
-            }
+            //static private string __GetType(int value)
+            //{
+            //    switch ((WIN_CERTIFICATE_TYPE)value)
+            //    {
+            //        case WIN_CERTIFICATE_TYPE.WIN_CERT_TYPE_PKCS_SIGNED_DATA: return "PKCS_SIGNED_DATA";
+            //        case WIN_CERTIFICATE_TYPE.WIN_CERT_TYPE_EFI_PKCS115: return "EFI_PKCS115";
+            //        case WIN_CERTIFICATE_TYPE.WIN_CERT_TYPE_EFI_GUID: return "EFI_GUID";
+            //    }
+            //    return value.ToString();
+            //}
         }
 
         protected override void _Execute(atom.Trace context, int level, string url, string file)

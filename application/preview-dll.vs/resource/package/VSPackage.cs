@@ -60,7 +60,7 @@ namespace resource.package
                         }
                         if (a_Context1 != null)
                         {
-                            a_Context1.OutputString("\r\n" + CONSTANT.NAME + " extension doesn't work without MetaOutput.\r\n    Please install it (https://www.metaoutput.net/download)\r\n");
+                            a_Context1.OutputString("\r\n" + CONSTANT.NAME + " extension doesn't work without MetaOutput.\r\n    Please install it --> https://www.metaoutput.net/download\r\n");
                             a_Context1.Activate();
                         }
                     }

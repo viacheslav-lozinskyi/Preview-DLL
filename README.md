@@ -36,7 +36,7 @@ Now you can look inside [DLL](https://en.wikipedia.org/wiki/Dynamic-link_library
 - Data visualization is based on [MetaOutput](https://www.metaoutput.net/)
 - Data extraction is based on [PeNet](http://secana.github.io/PeNet/index.html)
 - x86 disassembler is based on [Iced](https://www.nuget.org/packages/Iced)
-- .NET disassembler is based on [Mono.Reflection](https://www.nuget.org/packages/Mono.Reflection)
+- .NET decompiler is based on [ICSharpCode.Decompiler](https://github.com/icsharpcode/ILSpy)
 
 ---
 

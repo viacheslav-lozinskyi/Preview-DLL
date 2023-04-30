@@ -24,6 +24,7 @@ namespace resource.package
             public const string COPYRIGHT = "Copyright (c) 2020-2023 by Viacheslav Lozinskyi. All rights reserved.";
             public const string DESCRIPTION = "Quick preview of DLL, EXE and SYS files";
             public const string GUID = "6171BB93-BA14-4ECF-B72B-5107D12E5D0F";
+            public const string HOST = "MetaOutput";
             public const string NAME = "Preview-DLL";
             public const string VERSION = "1.0.13";
         }
@@ -49,7 +50,7 @@ namespace resource.package
                         var a_Context1 = (OutputWindowPane)null;
                         for (var i = a_Context.ToolWindows.OutputWindow.OutputWindowPanes.Count; i >= 1; i--)
                         {
-                            if (a_Context.ToolWindows.OutputWindow.OutputWindowPanes.Item(i).Name == "MetaOutput")
+                            if (a_Context.ToolWindows.OutputWindow.OutputWindowPanes.Item(i).Name == CONSTANT.HOST)
                             {
                                 a_Context1 = a_Context.ToolWindows.OutputWindow.OutputWindowPanes.Item(i);
                                 break;
@@ -57,7 +58,7 @@ namespace resource.package
                         }
                         if (a_Context1 == null)
                         {
-                            a_Context1 = a_Context.ToolWindows.OutputWindow.OutputWindowPanes.Add("MetaOutput");
+                            a_Context1 = a_Context.ToolWindows.OutputWindow.OutputWindowPanes.Add(CONSTANT.HOST);
                         }
                         if (a_Context1 != null)
                         {

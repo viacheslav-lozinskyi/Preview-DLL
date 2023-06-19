@@ -88,7 +88,7 @@ namespace resource.preview
                         foreach (var a_Context in data.Resources.VsVersionInfo.StringFileInfo.StringTable)
                         {
                             Send(context, NAME.EVENT.PARAMETER, level + 1, string.IsNullOrEmpty(a_Context.ProductName) ? "<[[[UNKNWON]]]>" : a_Context.ProductName, "", TYPE.VERSION, HINT.DATA_TYPE);
-                            if (GetState() == NAME.STATE.CANCEL)
+                            if (GetState() == NAME.STATE.WORK.CANCEL)
                             {
                                 return;
                             }
@@ -109,7 +109,7 @@ namespace resource.preview
                             }
                             foreach (var a_Context1 in a_Context.String)
                             {
-                                if (GetState() == NAME.STATE.CANCEL)
+                                if (GetState() == NAME.STATE.WORK.CANCEL)
                                 {
                                     return;
                                 }
@@ -149,7 +149,7 @@ namespace resource.preview
                 Send(context, NAME.EVENT.FOLDER, level, "[[[Headers]]]", "");
                 try
                 {
-                    if (GetState() == NAME.STATE.CANCEL)
+                    if (GetState() == NAME.STATE.WORK.CANCEL)
                     {
                         return;
                     }
@@ -360,7 +360,7 @@ namespace resource.preview
                         foreach (var a_Context in data.ExportedFunctions)
                         {
                             Send(context, (a_Context.HasName ? NAME.EVENT.FUNCTION : NAME.EVENT.WARNING), level + 1, GetFunctionName(a_Context.Name, a_Context.HasName), "", TYPE.FUNCTION, HINT.DATA_TYPE, "");
-                            if (GetState() == NAME.STATE.CANCEL)
+                            if (GetState() == NAME.STATE.WORK.CANCEL)
                             {
                                 return;
                             }
@@ -397,7 +397,7 @@ namespace resource.preview
                         foreach (var a_Context in data.ImportedFunctions)
                         {
                             var a_Name = GetFunctionName(a_Context.Name, true);
-                            if (GetState() == NAME.STATE.CANCEL)
+                            if (GetState() == NAME.STATE.WORK.CANCEL)
                             {
                                 return;
                             }
@@ -435,7 +435,7 @@ namespace resource.preview
                         Send(context, NAME.EVENT.FOLDER, level, "[[[Import Modules]]]", "", GetArraySize(a_Count), HINT.EMPTY);
                         foreach (var a_Context1 in data.ImportedFunctions)
                         {
-                            if (GetState() == NAME.STATE.CANCEL)
+                            if (GetState() == NAME.STATE.WORK.CANCEL)
                             {
                                 return;
                             }
@@ -560,7 +560,7 @@ namespace resource.preview
                         foreach (var a_Context in data)
                         {
                             Send(context, NAME.EVENT.PARAMETER, level + 1, GetHex(a_Context.PointerToRawData), "", TYPE.STRUCT, HINT.DATA_TYPE);
-                            if (GetState() == NAME.STATE.CANCEL)
+                            if (GetState() == NAME.STATE.WORK.CANCEL)
                             {
                                 return;
                             }
@@ -600,7 +600,7 @@ namespace resource.preview
                         foreach (var a_Context in data)
                         {
                             Send(context, NAME.EVENT.PARAMETER, level + 1, GetHex(a_Context.VirtualAddress), "", TYPE.STRUCT, HINT.DATA_TYPE);
-                            if (GetState() == NAME.STATE.CANCEL)
+                            if (GetState() == NAME.STATE.WORK.CANCEL)
                             {
                                 return;
                             }
@@ -657,7 +657,7 @@ namespace resource.preview
                         foreach (var a_Context in data)
                         {
                             Send(context, NAME.EVENT.PARAMETER, level + 1, GetHex(a_Context.FunctionStart), "", TYPE.FUNCTION, HINT.DATA_TYPE);
-                            if (GetState() == NAME.STATE.CANCEL)
+                            if (GetState() == NAME.STATE.WORK.CANCEL)
                             {
                                 return;
                             }
@@ -692,7 +692,7 @@ namespace resource.preview
                     try
                     {
                         Send(context, NAME.EVENT.FOLDER, level, "[[[Thread Local Storage]]]", "", TYPE.DIRECTORY, HINT.DATA_TYPE);
-                        if (GetState() == NAME.STATE.CANCEL)
+                        if (GetState() == NAME.STATE.WORK.CANCEL)
                         {
                             return;
                         }
@@ -710,7 +710,7 @@ namespace resource.preview
                             Send(context, NAME.EVENT.PARAMETER, level + 1, "[[[Callbacks]]]", "", GetArraySize(data.TlsCallbacks.Length), HINT.EMPTY);
                             foreach (var a_Context in data.TlsCallbacks)
                             {
-                                if (GetState() == NAME.STATE.CANCEL)
+                                if (GetState() == NAME.STATE.WORK.CANCEL)
                                 {
                                     return;
                                 }
@@ -802,7 +802,7 @@ namespace resource.preview
                         foreach (var a_Context in data)
                         {
                             Send(context, NAME.EVENT.FOLDER, level + 1, GetHex(a_Context.Name), "", TYPE.STRUCT, HINT.DATA_TYPE);
-                            if (GetState() == NAME.STATE.CANCEL)
+                            if (GetState() == NAME.STATE.WORK.CANCEL)
                             {
                                 return;
                             }
@@ -958,7 +958,7 @@ namespace resource.preview
                         foreach (var a_Context in data.ImageSectionHeaders)
                         {
                             Send(context, NAME.EVENT.PARAMETER, level + 1, a_Context.Name, "", TYPE.SECTION, HINT.DATA_TYPE);
-                            if (GetState() == NAME.STATE.CANCEL)
+                            if (GetState() == NAME.STATE.WORK.CANCEL)
                             {
                                 return;
                             }
@@ -1124,7 +1124,7 @@ namespace resource.preview
             //                Send(context, NAME.EVENT.PARAMETER, level + 1, "[[[Extensions]]]", "", TYPE.STRUCT, HINT.DATA_TYPE);
             //                foreach (var a_Context in data.Extensions)
             //                {
-            //                    if (GetState() == NAME.STATE.CANCEL)
+            //                    if (GetState() == NAME.STATE.WORK.CANCEL)
             //                    {
             //                        return;
             //                    }
@@ -1166,8 +1166,8 @@ namespace resource.preview
             {
                 {
                     context.
-                        SetFontState(NAME.FONT_STATE.BLINK).
-                        SetProgress(NAME.PROGRESS.INFINITE).
+                        SetTrace(null, NAME.STATE.TRACE.BLINK).
+                        SetProgress(CONSTANT.PROGRESS.INFINITE).
                         SendPreview(NAME.EVENT.INFO, url);
                 }
                 {
@@ -1184,7 +1184,7 @@ namespace resource.preview
                 }
                 {
                     context.
-                        SetFontState(NAME.FONT_STATE.NONE).
+                        SetFont(null, 0, NAME.STATE.FONT.NONE).
                         SetProgress(100).
                         SendPreview(NAME.EVENT.INFO, url);
                 }
